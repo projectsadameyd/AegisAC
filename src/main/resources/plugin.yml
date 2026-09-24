@@ -1,9 +1,9 @@
 name: AegisAC
-version: '${version}'
+version: 0.1.0-alpha
 main: dev.aegisac.core.AegisAC
 api-version: '1.21.11'
 author: _adam814
-description: Conservative alert-first anti-cheat for Paper 1.21.11
+description: Conservative alert-first anti-cheat for Paper 1.21.11.
 commands:
   aegis:
     description: AegisAC administration command
@@ -11,8 +11,11 @@ commands:
     permission: aegis.admin
 permissions:
   aegis.admin:
+    description: Access to AegisAC commands
     default: op
   aegis.alerts:
+    description: Receive AegisAC alerts
     default: op
   aegis.bypass:
+    description: Bypass AegisAC checks
     default: false

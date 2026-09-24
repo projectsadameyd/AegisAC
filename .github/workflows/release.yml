@@ -1,0 +1,56 @@
+name: Build and release AegisAC
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'pom.xml'
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Compile and package
+        run: mvn --batch-mode --no-transfer-progress clean package
+
+      - name: Validate JAR
+        run: |
+          JAR='target/AegisAC-0.1.0-alpha.jar'
+          test -s "$JAR"
+          jar tf "$JAR" | grep -q 'dev/aegisac/core/AegisAC.class'
+          jar tf "$JAR" | grep -q '^plugin.yml$'
+          unzip -t "$JAR"
+          sha256sum "$JAR" | tee target/AegisAC-0.1.0-alpha.jar.sha256
+
+      - name: Create/update prerelease and upload verified artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG='v0.1.0-alpha'
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" target/AegisAC-0.1.0-alpha.jar target/AegisAC-0.1.0-alpha.jar.sha256 --clobber
+          else
+            gh release create "$TAG" \
+              --target "$GITHUB_SHA" \
+              --title 'AegisAC 0.1.0-alpha' \
+              --prerelease \
+              --notes 'First public alpha of AegisAC for Paper 1.21.11 / Java 21. Alert-first by default; automatic bans and kicks are not enabled. Test on a private server before production use.' \
+              target/AegisAC-0.1.0-alpha.jar \
+              target/AegisAC-0.1.0-alpha.jar.sha256
+          fi
