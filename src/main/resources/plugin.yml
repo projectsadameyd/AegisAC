@@ -1,0 +1,18 @@
+name: AegisAC
+version: '${version}'
+main: dev.aegisac.core.AegisAC
+api-version: '1.21.11'
+author: _adam814
+description: Conservative alert-first anti-cheat for Paper 1.21.11
+commands:
+  aegis:
+    description: AegisAC administration command
+    usage: /aegis <alerts|status|reload|info>
+    permission: aegis.admin
+permissions:
+  aegis.admin:
+    default: op
+  aegis.alerts:
+    default: op
+  aegis.bypass:
+    default: false

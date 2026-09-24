@@ -1,0 +1,46 @@
+# AegisAC 0.1.0-alpha
+# Alert-first by design: this build never bans or kicks players.
+
+broadcast-credit: true
+broadcast-credit-seconds: 1800
+
+minimum-tps: 18.0
+maximum-ping-ms: 300
+
+alerts:
+  minimum-confidence: 0.72
+  cooldown-ms: 1250
+
+checks:
+  speed:
+    enabled: true
+    max-ground-horizontal-per-tick: 0.62
+    max-air-horizontal-per-tick: 0.78
+    buffer-to-alert: 4.0
+  fly:
+    enabled: true
+    suspicious-air-ticks: 14
+    buffer-to-alert: 5.0
+  timer:
+    enabled: true
+    max-moving-packets-per-second: 24.5
+    buffer-to-alert: 3.0
+  reach:
+    enabled: true
+    max-normal-reach: 4.25
+    high-ping-extra: 0.45
+    buffer-to-alert: 2.0
+  autoclicker:
+    enabled: true
+    max-cps: 22
+    min-samples: 30
+    buffer-to-alert: 4.0
+  fastplace:
+    enabled: true
+    max-places-per-second: 17
+    max-eye-distance: 6.25
+    buffer-to-alert: 3.0
+  velocity:
+    enabled: true
+    minimum-horizontal-response-ratio: 0.06
+    buffer-to-alert: 4.0
