@@ -20,6 +20,7 @@ public final class PlayerData {
     long remoteBlocks;
     long combatEvents;
     long movementExemptEvents;
+    long movementEvaluatedEvents;
     int airTicks;
     int stableGroundTicks;
     double lastVerticalDelta;
@@ -30,6 +31,9 @@ public final class PlayerData {
     final Map<CheckType, Double> buffers = new EnumMap<>(CheckType.class);
     final Map<CheckType, Long> lastAlertMillis = new EnumMap<>(CheckType.class);
     final Map<CheckType, Long> failedSamples = new EnumMap<>(CheckType.class);
+    final Map<CheckType, Long> alertCounts = new EnumMap<>(CheckType.class);
+    final Map<CheckType, Double> lastAlertConfidence = new EnumMap<>(CheckType.class);
+    final Map<CheckType, String> sanctionGate = new EnumMap<>(CheckType.class);
 
     Vector expectedVelocity;
     Location velocityStart;

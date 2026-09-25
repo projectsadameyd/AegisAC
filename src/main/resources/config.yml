@@ -1,4 +1,4 @@
-# AegisAC 0.3.0-alpha. New installs sanction only the remote interaction check.
+# AegisAC 0.3.1-alpha. Speed sanctions require repeated, high-confidence alerts on stable ground.
 
 broadcast-credit: true
 broadcast-credit-seconds: 1800
@@ -12,13 +12,17 @@ alerts:
 
 # Repeated eligible alerts advance a persisted sanction stage.
 # Stages 1-3: kicks; 4: one-hour temp block; 5: one-day temp block;
-# 6: permanent account + IP block only when the extra IP-ban switch is true.
+# 6: permanent account + IP block only for remote interaction when the extra IP-ban switch is true.
 enforcement:
   enabled: true
   permanent-ip-ban-enabled: false
-  eligible-checks: [FREECAM_INTERACT]
+  eligible-checks: [FREECAM_INTERACT, SPEED]
   minimum-confidence: 0.98
   alerts-required: 4
+  minimum-confidence-by-check:
+    SPEED: 0.92
+  alerts-required-by-check:
+    SPEED: 8
   evidence-window-ms: 90000
   cooldown-ms: 600000
 

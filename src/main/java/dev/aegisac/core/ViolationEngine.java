@@ -30,6 +30,8 @@ public final class ViolationEngine {
         long previous = data.lastAlertMillis.getOrDefault(type, 0L);
         if (now - previous < cooldown) return;
         data.lastAlertMillis.put(type, now);
+        data.alertCounts.merge(type, 1L, Long::sum);
+        data.lastAlertConfidence.put(type, confidence);
 
         int ping = player.getPing();
         double tps = plugin.currentTps();
@@ -47,7 +49,7 @@ public final class ViolationEngine {
             }
         }
         AegisAudit.warning(plugin, "ALERT", stripColors(message));
-        plugin.moderation().onAlert(player, type, confidence, detail);
+        plugin.moderation().onAlert(player, data, type, confidence, detail);
         data.setBuffer(type, Math.max(0.0, threshold * 0.55));
     }
 

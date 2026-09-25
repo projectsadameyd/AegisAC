@@ -1,6 +1,8 @@
 package dev.aegisac.core;
 
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -36,7 +38,6 @@ public final class MovementAnalyzer {
             data.airTicks = 0;
             data.stableGroundTicks++;
         } else {
-            data.movementExemptEvents++;
             data.airTicks++;
             data.stableGroundTicks = 0;
         }
@@ -48,10 +49,12 @@ public final class MovementAnalyzer {
                 plugin.getConfig().getInt("maximum-ping-ms", 300));
 
         if (!exempt) {
+            data.movementEvaluatedEvents++;
             speed(player, data, from, to, elapsedNanos, grounded);
             fly(player, data, dy, grounded);
             velocity(player, data, from, to, nowMillis);
         } else {
+            data.movementExemptEvents++;
             data.decay(CheckType.SPEED, 0.40);
             data.decay(CheckType.FLY, 0.40);
             data.decay(CheckType.VELOCITY, 0.35);
@@ -71,6 +74,8 @@ public final class MovementAnalyzer {
         double allowed = base * tickFactor;
         if (player.isSprinting()) allowed *= 1.08;
         allowed *= Math.max(1.0, player.getWalkSpeed() / 0.2f);
+        AttributeInstance movementSpeed = player.getAttribute(Attribute.MOVEMENT_SPEED);
+        if (movementSpeed != null) allowed *= Math.max(1.0, movementSpeed.getValue() / 0.1);
 
         double threshold = plugin.getConfig().getDouble("checks.speed.buffer-to-alert", 4.0);
         if (horizontal > allowed) {
