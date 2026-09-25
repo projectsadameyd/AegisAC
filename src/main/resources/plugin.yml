@@ -1,5 +1,5 @@
 name: AegisAC
-version: 0.3.4-alpha
+version: 0.3.5-alpha
 main: dev.aegisac.core.AegisAC
 api-version: '1.21.11'
 author: _adam814

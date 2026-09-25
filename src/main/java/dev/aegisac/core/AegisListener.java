@@ -25,8 +25,10 @@ public final class AegisListener implements Listener {
         this.combat = new CombatAnalyzer(plugin);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
+        // A teleport is a subclass of PlayerMoveEvent, not a client movement sample.
+        if (event instanceof PlayerTeleportEvent) return;
         movement.handle(event, plugin.data().get(event.getPlayer().getUniqueId()));
     }
 
@@ -194,6 +196,7 @@ public final class AegisListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         AegisAudit.info(plugin, "QUIT", event.getPlayer().getName() + " uuid=" + event.getPlayer().getUniqueId());
+        plugin.moderation().clearEvidence(event.getPlayer().getUniqueId());
         plugin.data().remove(event.getPlayer().getUniqueId());
     }
 

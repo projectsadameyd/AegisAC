@@ -27,6 +27,7 @@ public final class Moderation {
     private final Map<UUID, Record> records = new ConcurrentHashMap<>();
     private final Map<String, Boolean> ipBans = new ConcurrentHashMap<>();
     private final Map<UUID, Map<CheckType, Deque<Long>>> evidence = new ConcurrentHashMap<>();
+    private final Map<UUID, Deque<Long>> severeSpeedEvidence = new ConcurrentHashMap<>();
     private final Map<UUID, Long> lastAction = new ConcurrentHashMap<>();
 
     Moderation(AegisAC plugin) {
@@ -69,6 +70,14 @@ public final class Moderation {
     }
 
     public void onAlert(Player player, PlayerData data, CheckType type, double confidence, String detail) {
+        onAlert(player, data, type, confidence, detail, false);
+    }
+
+    public void onSevereSpeed(Player player, PlayerData data, String detail) {
+        onAlert(player, data, CheckType.SPEED, 0.99, detail, true);
+    }
+
+    private void onAlert(Player player, PlayerData data, CheckType type, double confidence, String detail, boolean severe) {
         if (!plugin.getConfig().getBoolean("enforcement.enabled", true)) {
             data.sanctionGate.put(type, "enforcement disabled");
             return;
@@ -95,21 +104,25 @@ public final class Moderation {
         }
         long now = System.currentTimeMillis();
         UUID uuid = player.getUniqueId();
-        long remaining = cooldownRemaining(uuid);
+        long remaining = severe ? cooldownRemainingSevere(uuid) : cooldownRemaining(uuid);
         if (remaining > 0L) {
-            data.sanctionGate.put(type, "cooldown " + ((remaining + 999) / 1000) + "s; next=" + nextAction(uuid));
+            data.sanctionGate.put(type, (severe ? "severe " : "") + "cooldown "
+                    + ((remaining + 999) / 1000) + "s; next=" + nextAction(uuid));
             return;
         }
-        Deque<Long> hits = evidence.computeIfAbsent(uuid, ignored -> new EnumMap<>(CheckType.class))
-                .computeIfAbsent(type, ignored -> new ArrayDeque<>());
-        long window = plugin.getConfig().getLong("enforcement.evidence-window-ms", 90_000L);
-        int required = Math.max(3, plugin.getConfig().getInt("enforcement.alerts-required-by-check." + type.name(),
-                plugin.getConfig().getInt("enforcement.alerts-required", 4)));
-        long minimumSpan = Math.max(0L, plugin.getConfig().getLong(
-                "enforcement.minimum-evidence-span-ms-by-check." + type.name(),
-                type == CheckType.SPEED ? 5000L : 0L));
+        Deque<Long> hits = severe ? severeSpeedEvidence.computeIfAbsent(uuid, ignored -> new ArrayDeque<>())
+                : evidence.computeIfAbsent(uuid, ignored -> new EnumMap<>(CheckType.class))
+                        .computeIfAbsent(type, ignored -> new ArrayDeque<>());
+        long window = severe ? plugin.getConfig().getLong("enforcement.severe-speed.evidence-window-ms", 5000L)
+                : plugin.getConfig().getLong("enforcement.evidence-window-ms", 90_000L);
+        int required = severe ? Math.max(2, plugin.getConfig().getInt("enforcement.severe-speed.alerts-required", 2))
+                : Math.max(3, plugin.getConfig().getInt("enforcement.alerts-required-by-check." + type.name(),
+                        plugin.getConfig().getInt("enforcement.alerts-required", 4)));
+        long minimumSpan = severe ? Math.max(150L, plugin.getConfig().getLong("enforcement.severe-speed.minimum-span-ms", 150L))
+                : Math.max(0L, plugin.getConfig().getLong("enforcement.minimum-evidence-span-ms-by-check." + type.name(),
+                        type == CheckType.SPEED ? 5000L : 0L));
         if (!SanctionEvidence.recordAndReady(hits, now, window, required, minimumSpan)) {
-            data.sanctionGate.put(type, "evidence " + hits.size() + "/" + required
+            data.sanctionGate.put(type, (severe ? "severe " : "") + "evidence " + hits.size() + "/" + required
                     + " alerts; span=" + (hits.isEmpty() ? 0 : now - hits.peekFirst()) + "ms"
                     + (minimumSpan > 0 ? " (needs " + minimumSpan + "ms)" : ""));
             return;
@@ -119,7 +132,7 @@ public final class Moderation {
         lastAction.put(uuid, now);
         Record old = records.getOrDefault(uuid, new Record(0, 0, false, "", ""));
         int stage = old.stage() + 1;
-        String reason = type.name() + ": " + detail;
+        String reason = (severe ? "SEVERE_" : "") + type.name() + ": " + detail;
         if (stage <= 3) {
             records.put(uuid, new Record(stage, 0, false, reason, ""));
             save();
@@ -165,10 +178,21 @@ public final class Moderation {
         return Math.max(0L, end - System.currentTimeMillis());
     }
 
+    public long cooldownRemainingSevere(UUID uuid) {
+        long end = lastAction.getOrDefault(uuid, 0L)
+                + plugin.getConfig().getLong("enforcement.severe-speed.cooldown-ms", 15_000L);
+        return Math.max(0L, end - System.currentTimeMillis());
+    }
+
+    public void clearEvidence(UUID uuid) {
+        evidence.remove(uuid);
+        severeSpeedEvidence.remove(uuid);
+    }
+
     public void reset(UUID uuid) {
         Record removed = records.remove(uuid);
         if (removed != null && !removed.ip().isEmpty()) ipBans.remove(removed.ip());
-        evidence.remove(uuid);
+        clearEvidence(uuid);
         lastAction.remove(uuid);
         save();
     }

@@ -19,13 +19,12 @@ public final class WorldUtil {
 
     public static boolean nearSpecialMovementBlock(Location location) {
         if (location == null || location.getWorld() == null) return true;
-        int bx = floor(location.getX());
-        int by = floor(location.getY());
-        int bz = floor(location.getZ());
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    Block block = location.getWorld().getBlockAt(bx + x, by + y, bz + z);
+        // Only blocks touching the player's feet or body can alter movement.
+        // A 3x3x3 scan exempted ordinary movement merely near stairs or ice.
+        for (int x = floor(location.getX() - 0.32); x <= floor(location.getX() + 0.32); x++) {
+            for (int y = floor(location.getY() - 0.12); y <= floor(location.getY()); y++) {
+                for (int z = floor(location.getZ() - 0.32); z <= floor(location.getZ() + 0.32); z++) {
+                    Block block = location.getWorld().getBlockAt(x, y, z);
                     if (isSpecial(block.getType())) return true;
                 }
             }
@@ -44,7 +43,17 @@ public final class WorldUtil {
         return movementExemptionReason(player, data, minTps, currentTps, maxPing) != null;
     }
 
+    public static boolean basicMovementExempt(Player player, PlayerData data, double minTps, double currentTps,
+                                              int maxPing, Location destination) {
+        return movementExemptionReason(player, data, minTps, currentTps, maxPing, destination) != null;
+    }
+
     public static String movementExemptionReason(Player player, PlayerData data, double minTps, double currentTps, int maxPing) {
+        return movementExemptionReason(player, data, minTps, currentTps, maxPing, player.getLocation());
+    }
+
+    private static String movementExemptionReason(Player player, PlayerData data, double minTps,
+                                                  double currentTps, int maxPing, Location destination) {
         if (player.hasPermission("aegis.bypass")) return "aegis.bypass permission";
         if (player.getGameMode().name().equals("CREATIVE") || player.getGameMode().name().equals("SPECTATOR")) return "creative/spectator mode";
         if (player.getAllowFlight() || player.isFlying() || player.isInsideVehicle()) return "flight permission/vehicle";
@@ -55,7 +64,7 @@ public final class WorldUtil {
         if (now - data.lastTeleportMillis < 1400L) return "recent teleport/join";
         if (now - data.lastVelocityMillis < 900L) return "recent velocity";
         if (now - data.lastDamageMillis < 500L) return "recent damage";
-        if (nearSpecialMovementBlock(player.getLocation())) return "near special block";
+        if (nearSpecialMovementBlock(destination)) return "touching special block";
         return null;
     }
 

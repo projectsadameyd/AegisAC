@@ -42,19 +42,27 @@ public final class MovementAnalyzer {
             data.stableGroundTicks = 0;
         }
 
-        timer(player, data, nowMillis);
-
         boolean exempt = WorldUtil.basicMovementExempt(player, data,
                 plugin.getConfig().getDouble("minimum-tps", 18.0), plugin.currentTps(),
-                plugin.getConfig().getInt("maximum-ping-ms", 300));
+                plugin.getConfig().getInt("maximum-ping-ms", 300), to)
+                || WorldUtil.nearSpecialMovementBlock(from);
 
         if (!exempt) {
             data.movementEvaluatedEvents++;
-            speed(player, data, from, to, elapsedNanos, grounded);
+            if (speed(player, data, from, to, elapsedNanos, grounded, nowMillis)) {
+                event.setCancelled(true);
+                data.severeMoves++;
+                data.previousHorizontal = 0;
+                data.lastLocation = from.clone();
+                return;
+            }
+            timer(player, data, nowMillis);
             fly(player, data, dy, grounded);
             velocity(player, data, from, to, nowMillis);
         } else {
             data.movementExemptEvents++;
+            data.moveTimes.clear();
+            data.previousHorizontal = 0;
             data.decay(CheckType.SPEED, 0.40);
             data.decay(CheckType.FLY, 0.40);
             data.decay(CheckType.VELOCITY, 0.35);
@@ -64,8 +72,9 @@ public final class MovementAnalyzer {
         data.lastLocation = to.clone();
     }
 
-    private void speed(Player player, PlayerData data, Location from, Location to, long elapsedNanos, boolean grounded) {
-        if (!plugin.getConfig().getBoolean("checks.speed.enabled", true)) return;
+    private boolean speed(Player player, PlayerData data, Location from, Location to, long elapsedNanos,
+                          boolean grounded, long nowMillis) {
+        if (!plugin.getConfig().getBoolean("checks.speed.enabled", true)) return false;
         double horizontal = WorldUtil.horizontalDistance(from, to);
         double tickFactor = Math.max(1.0, Math.min(3.0, elapsedNanos / 50_000_000.0));
         double base = grounded
@@ -77,15 +86,31 @@ public final class MovementAnalyzer {
         AttributeInstance movementSpeed = player.getAttribute(Attribute.MOVEMENT_SPEED);
         if (movementSpeed != null) allowed *= Math.max(1.0, movementSpeed.getValue() / 0.1);
 
+        double predicted = MotionEnvelope.predictedAllowance(allowed, data.previousHorizontal, tickFactor);
+        data.previousHorizontal = horizontal;
+        if (plugin.getConfig().getBoolean("checks.speed.severe.enabled", true)
+                && MotionEnvelope.severe(horizontal, predicted,
+                        plugin.getConfig().getDouble("checks.speed.severe.multiplier", 3.0),
+                        plugin.getConfig().getDouble("checks.speed.severe.absolute-distance", 6.0))) {
+            long spacing = plugin.getConfig().getLong("checks.speed.severe.minimum-alert-spacing-ms", 150L);
+            if (nowMillis - data.lastSevereAlertMillis >= spacing) {
+                data.lastSevereAlertMillis = nowMillis;
+                plugin.violations().flagSevereSpeed(player, data,
+                        "h=" + fmt(horizontal) + ", predictedMax=" + fmt(predicted));
+            }
+            return true;
+        }
+
         double threshold = plugin.getConfig().getDouble("checks.speed.buffer-to-alert", 4.0);
-        if (horizontal > allowed) {
-            double over = horizontal / Math.max(0.001, allowed);
+        if (horizontal > predicted) {
+            double over = horizontal / Math.max(0.001, predicted);
             double confidence = Math.min(0.98, 0.72 + (over - 1.0) * 0.22);
             plugin.violations().flag(player, data, CheckType.SPEED, Math.min(2.0, over - 0.75), threshold,
-                    confidence, "h=" + fmt(horizontal) + ", max=" + fmt(allowed));
+                    confidence, "h=" + fmt(horizontal) + ", predictedMax=" + fmt(predicted));
         } else {
             data.decay(CheckType.SPEED, 0.18);
         }
+        return false;
     }
 
     private void fly(Player player, PlayerData data, double dy, boolean grounded) {

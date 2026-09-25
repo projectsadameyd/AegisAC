@@ -15,6 +15,8 @@ public final class PlayerData {
     long lastVelocityMillis;
     long lastDamageMillis;
     long lastRemoteAuditMillis;
+    long lastSevereAlertMillis;
+    long severeMoves;
     long moveEvents;
     long interactionEvents;
     long remoteBlocks;
@@ -24,6 +26,7 @@ public final class PlayerData {
     int airTicks;
     int stableGroundTicks;
     double lastVerticalDelta;
+    double previousHorizontal;
 
     final Deque<Long> moveTimes = new ArrayDeque<>();
     final Deque<Long> swingTimes = new ArrayDeque<>();

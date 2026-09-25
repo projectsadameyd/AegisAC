@@ -34,43 +34,44 @@ jobs:
       - name: Compile and package
         run: mvn --batch-mode --no-transfer-progress clean package
 
-      - name: Verify sustained sanction evidence
+      - name: Verify sanction evidence and severe movement envelope
         run: |
           mkdir -p target/test-classes
-          javac -cp target/classes -d target/test-classes src/test/java/dev/aegisac/core/SanctionEvidenceTest.java
+          javac -cp target/classes -d target/test-classes src/test/java/dev/aegisac/core/SanctionEvidenceTest.java src/test/java/dev/aegisac/core/MotionEnvelopeTest.java
           java -ea -cp target/classes:target/test-classes dev.aegisac.core.SanctionEvidenceTest
+          java -ea -cp target/classes:target/test-classes dev.aegisac.core.MotionEnvelopeTest
 
       - name: Validate JAR
         run: |
-          JAR='target/AegisAC-0.3.4-alpha.jar'
+          JAR='target/AegisAC-0.3.5-alpha.jar'
           test -s "$JAR"
           jar tf "$JAR" | grep -q 'dev/aegisac/core/AegisAC.class'
           jar tf "$JAR" | grep -q '^plugin.yml$'
           unzip -t "$JAR"
-          sha256sum "$JAR" | tee target/AegisAC-0.3.4-alpha.jar.sha256
+          sha256sum "$JAR" | tee target/AegisAC-0.3.5-alpha.jar.sha256
 
       - name: Upload CI build
         uses: actions/upload-artifact@v4
         with:
-          name: AegisAC-0.3.4-alpha
+          name: AegisAC-0.3.5-alpha
           path: |
-            target/AegisAC-0.3.4-alpha.jar
-            target/AegisAC-0.3.4-alpha.jar.sha256
+            target/AegisAC-0.3.5-alpha.jar
+            target/AegisAC-0.3.5-alpha.jar.sha256
 
       - name: Create/update prerelease and upload verified artifacts
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG='v0.3.4-alpha'
+          TAG='v0.3.5-alpha'
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" target/AegisAC-0.3.4-alpha.jar target/AegisAC-0.3.4-alpha.jar.sha256 --clobber
+            gh release upload "$TAG" target/AegisAC-0.3.5-alpha.jar target/AegisAC-0.3.5-alpha.jar.sha256 --clobber
           else
             gh release create "$TAG" \
               --target "$GITHUB_SHA" \
-              --title 'AegisAC 0.3.4-alpha' \
+              --title 'AegisAC 0.3.5-alpha' \
               --prerelease \
-              --notes 'Paper 1.21.11 alpha adds /aegis enforcement cooldown <seconds>, so admins can shorten the ten-minute wait during controlled testing without editing config.yml. Status shows the configured cooldown and debug shows the next sanction and remaining cooldown. Three kicks precede the first temporary ban; only remote-interaction evidence can reach the optional permanent IP-ban stage. Existing settings are preserved.' \
-              target/AegisAC-0.3.4-alpha.jar \
-              target/AegisAC-0.3.4-alpha.jar.sha256
+              --notes 'Paper 1.21.11 alpha rejects severe non-exempt Speed movement immediately and advances the existing sanction ladder after two spaced severe attempts within five seconds, using a separate 15-second cooldown. Tightened special-block exemptions and excluded teleports and exempt movements from timer samples. Debug shows rejected movements and both cooldowns. This limited event-level prediction does not guarantee universal cheat detection or zero false positives; test on a private server.' \
+              target/AegisAC-0.3.5-alpha.jar \
+              target/AegisAC-0.3.5-alpha.jar.sha256
           fi

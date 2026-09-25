@@ -53,6 +53,21 @@ public final class ViolationEngine {
         data.setBuffer(type, Math.max(0.0, threshold * 0.55));
     }
 
+    public void flagSevereSpeed(Player player, PlayerData data, String detail) {
+        data.failedSamples.merge(CheckType.SPEED, 1L, Long::sum);
+        data.alertCounts.merge(CheckType.SPEED, 1L, Long::sum);
+        data.lastAlertConfidence.put(CheckType.SPEED, 0.99);
+        String message = "[Aegis] " + player.getName() + " severe Speed movement rejected (" + detail
+                + ", ping=" + player.getPing() + "ms, tps=" + round(plugin.currentTps()) + ")";
+        AegisAudit.warning(plugin, "SEVERE_MOVEMENT", message);
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (online.hasPermission("aegis.alerts") && !alertsDisabled.contains(online.getUniqueId())) {
+                online.sendMessage("§c" + message);
+            }
+        }
+        plugin.moderation().onSevereSpeed(player, data, detail);
+    }
+
     public boolean toggleAlerts(Player player) {
         UUID uuid = player.getUniqueId();
         if (alertsDisabled.remove(uuid)) return true;
