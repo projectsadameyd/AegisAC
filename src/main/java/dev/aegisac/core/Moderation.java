@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +26,7 @@ public final class Moderation {
     private final File file;
     private final Map<UUID, Record> records = new ConcurrentHashMap<>();
     private final Map<String, Boolean> ipBans = new ConcurrentHashMap<>();
-    private final Map<UUID, Deque<Long>> evidence = new ConcurrentHashMap<>();
+    private final Map<UUID, Map<CheckType, Deque<Long>>> evidence = new ConcurrentHashMap<>();
     private final Map<UUID, Long> lastAction = new ConcurrentHashMap<>();
 
     Moderation(AegisAC plugin) {
@@ -67,21 +68,54 @@ public final class Moderation {
         }
     }
 
-    public void onAlert(Player player, CheckType type, double confidence, String detail) {
-        if (!plugin.getConfig().getBoolean("enforcement.enabled", true) || player.hasPermission("aegis.bypass")) return;
-        if (!plugin.getConfig().getStringList("enforcement.eligible-checks").contains(type.name())) return;
-        if (confidence < plugin.getConfig().getDouble("enforcement.minimum-confidence", 0.98)) return;
+    public void onAlert(Player player, PlayerData data, CheckType type, double confidence, String detail) {
+        if (!plugin.getConfig().getBoolean("enforcement.enabled", true)) {
+            data.sanctionGate.put(type, "enforcement disabled");
+            return;
+        }
+        if (player.hasPermission("aegis.bypass")) {
+            data.sanctionGate.put(type, "bypass permission");
+            return;
+        }
+        if (!plugin.getConfig().getStringList("enforcement.eligible-checks").contains(type.name())) {
+            data.sanctionGate.put(type, "check not eligible");
+            return;
+        }
+        double minimum = plugin.getConfig().getDouble("enforcement.minimum-confidence-by-check." + type.name(),
+                plugin.getConfig().getDouble("enforcement.minimum-confidence", 0.98));
+        if (confidence < minimum) {
+            data.sanctionGate.put(type, "confidence " + Math.round(confidence * 100)
+                    + "% below " + Math.round(minimum * 100) + "%");
+            return;
+        }
+        if (type == CheckType.SPEED && data.stableGroundTicks < 8) {
+            data.sanctionGate.put(type, "need 8 stable ground ticks");
+            return;
+        }
         if (plugin.currentTps() < plugin.getConfig().getDouble("minimum-tps", 18.0)
-                || player.getPing() > plugin.getConfig().getInt("maximum-ping-ms", 300)) return;
+                || player.getPing() > plugin.getConfig().getInt("maximum-ping-ms", 300)) {
+            data.sanctionGate.put(type, "TPS or ping exemption");
+            return;
+        }
         long now = System.currentTimeMillis();
         UUID uuid = player.getUniqueId();
-        if (now - lastAction.getOrDefault(uuid, 0L) < plugin.getConfig().getLong("enforcement.cooldown-ms", 600_000L)) return;
-        Deque<Long> hits = evidence.computeIfAbsent(uuid, ignored -> new ArrayDeque<>());
+        if (now - lastAction.getOrDefault(uuid, 0L) < plugin.getConfig().getLong("enforcement.cooldown-ms", 600_000L)) {
+            data.sanctionGate.put(type, "cooldown after previous sanction");
+            return;
+        }
+        Deque<Long> hits = evidence.computeIfAbsent(uuid, ignored -> new EnumMap<>(CheckType.class))
+                .computeIfAbsent(type, ignored -> new ArrayDeque<>());
         long window = plugin.getConfig().getLong("enforcement.evidence-window-ms", 90_000L);
         while (!hits.isEmpty() && now - hits.peekFirst() > window) hits.removeFirst();
         hits.addLast(now);
-        if (hits.size() < Math.max(3, plugin.getConfig().getInt("enforcement.alerts-required", 4))) return;
+        int required = Math.max(3, plugin.getConfig().getInt("enforcement.alerts-required-by-check." + type.name(),
+                plugin.getConfig().getInt("enforcement.alerts-required", 4)));
+        if (hits.size() < required) {
+            data.sanctionGate.put(type, "evidence " + hits.size() + "/" + required + " alerts in window");
+            return;
+        }
         hits.clear();
+        data.sanctionGate.put(type, "sanction stage advanced");
         lastAction.put(uuid, now);
         Record old = records.getOrDefault(uuid, new Record(0, 0, false, "", ""));
         int stage = old.stage() + 1;
@@ -100,7 +134,7 @@ public final class Moderation {
                     + " action=temp-ban until=" + (now + duration) + " reason=" + reason);
             player.kickPlayer("AegisAC: temporary restriction until " + java.time.Instant.ofEpochMilli(now + duration)
                     + ". Contact staff to appeal.");
-        } else if (plugin.getConfig().getBoolean("enforcement.permanent-ip-ban-enabled", false)) {
+        } else if (type != CheckType.SPEED && plugin.getConfig().getBoolean("enforcement.permanent-ip-ban-enabled", false)) {
             InetSocketAddress address = player.getAddress();
             if (address == null || address.getAddress() == null) return;
             String ip = address.getAddress().getHostAddress();
@@ -112,7 +146,7 @@ public final class Moderation {
             player.kickPlayer("AegisAC: banned. Contact server staff to appeal.");
         } else {
             AegisAudit.warning(plugin, "REVIEW_REQUIRED", player.getName() + " uuid=" + uuid
-                    + " permanent IP banning is disabled; reason=" + reason);
+                    + " permanent IP banning is disabled or check requires review; reason=" + reason);
         }
     }
 

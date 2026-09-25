@@ -73,6 +73,21 @@ public final class AegisCommand implements CommandExecutor {
                     + "§7. Other checks produce staff alerts only.");
             return true;
         }
+        if (args[0].equalsIgnoreCase("enforcement") && args.length == 3 && args[1].equalsIgnoreCase("speed")) {
+            if (!args[2].equalsIgnoreCase("on") && !args[2].equalsIgnoreCase("off")) {
+                sender.sendMessage("§7Usage: §f/aegis enforcement speed <on|off>");
+                return true;
+            }
+            java.util.List<String> checks = new java.util.ArrayList<>(plugin.getConfig().getStringList("enforcement.eligible-checks"));
+            checks.removeIf(name -> name.equalsIgnoreCase("SPEED"));
+            if (args[2].equalsIgnoreCase("on")) checks.add("SPEED");
+            plugin.getConfig().set("enforcement.eligible-checks", checks);
+            plugin.saveConfig();
+            sender.sendMessage("§7Speed sanctions " + (args[2].equalsIgnoreCase("on") ? "enabled" : "disabled")
+                    + "§7. Requires sustained high-confidence alerts on stable ground.");
+            AegisAudit.warning(plugin, "SPEED_ENFORCEMENT", "actor=" + sender.getName() + " enabled=" + args[2]);
+            return true;
+        }
         if (args[0].equalsIgnoreCase("enforcement") && args.length == 2) {
             if (!args[1].equalsIgnoreCase("on") && !args[1].equalsIgnoreCase("off")) {
                 sender.sendMessage("§7Usage: §f/aegis enforcement <on|off>");
@@ -113,6 +128,7 @@ public final class AegisCommand implements CommandExecutor {
                     + target.hasPermission("aegis.bypass") + "§7, mode=§f" + target.getGameMode()
                     + "§7, ping=§f" + target.getPing());
             sender.sendMessage("§7Movement: §f" + data.moveEvents + " §7events, §f"
+                    + data.movementEvaluatedEvents + " §7evaluated, §f"
                     + data.movementExemptEvents + " §7exempt; current reason: §f"
                     + (reason == null ? "none" : reason));
             sender.sendMessage("§7Block interactions: §f" + data.interactionEvents + "§7; canceled as remote: §f"
@@ -120,8 +136,10 @@ public final class AegisCommand implements CommandExecutor {
             sender.sendMessage("§7Checks with failed samples (not proof of cheating):");
             for (CheckType type : CheckType.values()) {
                 long count = data.failedSamples.getOrDefault(type, 0L);
-                if (count > 0) sender.sendMessage("§7" + type.display() + " §f" + count
-                        + "§7; buffer=§f" + String.format(java.util.Locale.ROOT, "%.2f", data.buffer(type)));
+                if (count > 0) sender.sendMessage("§7" + type.display() + " samples=§f" + count
+                        + "§7; alerts=§f" + data.alertCounts.getOrDefault(type, 0L)
+                        + "§7; last confidence=§f" + Math.round(data.lastAlertConfidence.getOrDefault(type, 0.0) * 100) + "%"
+                        + "§7; gate=§f" + data.sanctionGate.getOrDefault(type, "no alert yet"));
             }
             sender.sendMessage("§7Sanctions=§f" + plugin.getConfig().getBoolean("enforcement.enabled", true)
                     + "§7; eligible=§f" + plugin.getConfig().getStringList("enforcement.eligible-checks"));
@@ -174,7 +192,7 @@ public final class AegisCommand implements CommandExecutor {
             if (removed) AegisAudit.warning(plugin, "IP_UNBAN", "actor=" + sender.getName() + " ip=" + args[1]);
             return true;
         }
-        sender.sendMessage("§7Usage: §f/aegis <alerts|status|debug|enforcement|ipban|inspect|reset|pardon|unban-ip|reload|info>");
+        sender.sendMessage("§7Usage: §f/aegis <alerts|status|debug|enforcement [speed] <on|off>|ipban|inspect|reset|pardon|unban-ip|reload|info>");
         return true;
     }
 }
