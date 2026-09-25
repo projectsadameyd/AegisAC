@@ -1,6 +1,9 @@
 package dev.aegisac.core;
 
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,6 +34,7 @@ public final class AegisListener implements Listener {
     public void onDamage(EntityDamageByEntityEvent event) {
         if (event.getDamager() instanceof Player player) {
             PlayerData data = plugin.data().get(player.getUniqueId());
+            data.combatEvents++;
             combat.handle(event, data);
         }
         if (event.getEntity() instanceof Player victim) {
@@ -120,41 +124,54 @@ public final class AegisListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onRemoteBreak(BlockBreakEvent event) {
-        if (remote(event.getPlayer(), event.getBlock().getLocation().add(0.5, 0.5, 0.5))) event.setCancelled(true);
+        if (remote(event.getPlayer(), event.getBlock(), false)) event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onRemotePlace(BlockPlaceEvent event) {
-        if (remote(event.getPlayer(), event.getBlockPlaced().getLocation().add(0.5, 0.5, 0.5))) event.setCancelled(true);
+        if (remote(event.getPlayer(), event.getBlockPlaced(), true)) event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onRemoteInteract(PlayerInteractEvent event) {
         if (event.getClickedBlock() != null
-                && remote(event.getPlayer(), event.getClickedBlock().getLocation().add(0.5, 0.5, 0.5))) {
+                && remote(event.getPlayer(), event.getClickedBlock(), false)) {
             event.setCancelled(true);
         }
     }
 
-    private boolean remote(Player player, Location center) {
+    private boolean remote(Player player, Block target, boolean placedBlock) {
+        PlayerData data = plugin.data().get(player.getUniqueId());
+        data.interactionEvents++;
         if (!plugin.getConfig().getBoolean("checks.remote-interact.enabled", true)
                 || player.hasPermission("aegis.bypass") || player.getGameMode().name().equals("CREATIVE")
                 || player.getGameMode().name().equals("SPECTATOR")) return false;
         Location eye = player.getEyeLocation();
-        if (eye.getWorld() != center.getWorld()) return false;
-        double distance = eye.distance(center);
-        double limit = plugin.getConfig().getDouble("checks.remote-interact.max-eye-distance", 8.5);
+        if (eye.getWorld() != target.getWorld()) return false;
+        // Measure to the nearest point of the block, not its center.
+        // Placed blocks can legitimately be one block past the clicked face.
+        org.bukkit.util.BoundingBox box = target.getBoundingBox();
+        double dx = eye.getX() - Math.max(box.getMinX(), Math.min(box.getMaxX(), eye.getX()));
+        double dy = eye.getY() - Math.max(box.getMinY(), Math.min(box.getMaxY(), eye.getY()));
+        double dz = eye.getZ() - Math.max(box.getMinZ(), Math.min(box.getMaxZ(), eye.getZ()));
+        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        AttributeInstance reach = player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE);
+        double limit = (reach == null ? 4.5 : reach.getValue())
+                + plugin.getConfig().getDouble("checks.remote-interact.reach-margin", 1.25)
+                + (placedBlock ? 1.5 : 0.0);
         if (distance <= limit) return false;
-        PlayerData data = plugin.data().get(player.getUniqueId());
+        data.remoteBlocks++;
         long now = System.currentTimeMillis();
         if (now - data.lastRemoteAuditMillis >= 5000L) {
             data.lastRemoteAuditMillis = now;
             AegisAudit.warning(plugin, "REMOTE_BLOCKED", player.getName() + " uuid=" + player.getUniqueId()
-                    + " distance=" + fmt(distance) + " (further events are rate-limited)");
+                    + " distance=" + fmt(distance) + " allowed=" + fmt(limit)
+                    + " (further events are rate-limited)");
         }
         // Other plugins can teleport players or extend reach. Cancelling is safer than
         // treating this client-side symptom as proof of a specific Freecam mod.
-        if (plugin.currentTps() >= plugin.getConfig().getDouble("minimum-tps", 18.0)
+        if (now - data.lastTeleportMillis >= 1400L
+                && plugin.currentTps() >= plugin.getConfig().getDouble("minimum-tps", 18.0)
                 && player.getPing() <= plugin.getConfig().getInt("maximum-ping-ms", 300)) {
             plugin.violations().flag(player, data,
                     CheckType.FREECAM_INTERACT, 1.0,

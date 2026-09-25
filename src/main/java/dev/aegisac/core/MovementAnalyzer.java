@@ -14,6 +14,7 @@ public final class MovementAnalyzer {
     }
 
     public void handle(PlayerMoveEvent event, PlayerData data) {
+        data.moveEvents++;
         Location from = event.getFrom();
         Location to = event.getTo();
         if (to == null || from.getWorld() == null || to.getWorld() == null || from.getWorld() != to.getWorld()) return;
@@ -35,6 +36,7 @@ public final class MovementAnalyzer {
             data.airTicks = 0;
             data.stableGroundTicks++;
         } else {
+            data.movementExemptEvents++;
             data.airTicks++;
             data.stableGroundTicks = 0;
         }

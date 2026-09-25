@@ -1,16 +1,16 @@
-# AegisAC 0.2.1-alpha
+# AegisAC 0.3.0-alpha
 
 Paper 1.21.11 / Java 21 anti-cheat prototype. Put the built JAR in `plugins/` and restart Paper. Test on a private server before deploying to players.
 
 ## Scope and limitations
 
-No server plugin can guarantee detection of every cheat, instant detection, zero false positives, or superior performance to GrimAC without controlled benchmarks. Freecam that only moves the client's camera does not send a distinctive movement signal to the server. AegisAC cancels **remote block break, placement, and interaction** when the player's actual server-side eye position is more than 8.5 blocks from the block center. This may be caused by unusual server plugins, so automatic sanctions are disabled by default. Paper's built-in Anti-Xray is preferable for ore exposure mitigation.
+No server plugin can guarantee detection of every cheat, instant detection, zero false positives, or superior performance to GrimAC without controlled benchmarks. **Passive Freecam is not detectable by this plugin**: a camera moving only on the client sends no distinctive movement to Paper. AegisAC immediately cancels block break, placement, and interaction **beyond the player's server-side block-reach attribute plus a safety margin**. This stops a class of remote actions, not passive viewing. Paper's [built-in Anti-Xray](https://docs.papermc.io/paper/anti-xray/) reduces ore information sent to clients; it does not remove Freecam or hide every visible build.
 
 The existing Speed, Fly, Timer, Reach, AutoClicker, FastPlace, and Velocity checks still generate staff alerts. They do not automatically escalate sanctions by default. The new remote-interaction check adds its own alerts, distinct from claims that a Freecam client was identified.
 
 ## Sanctions and appeals
 
-Set `enforcement.enabled: true` only after reviewing alerts and testing compatibility. For each eligible check, four high-confidence alerts within 90 seconds count as one sanction event, with a 10-minute cooldown:
+New installations have `enforcement.enabled: true` for the remote-interaction check only. Existing `config.yml` files retain their previous value; run `/aegis status` and, if your server still shows `false`, `/aegis enforcement on`. This does not automatically punish Speed, Fly, Timer, or other heuristic alerts. For each eligible check, four high-confidence alerts within 90 seconds count as one sanction event, with a 10-minute cooldown:
 
 | Event | Action |
 | --- | --- |
@@ -19,7 +19,7 @@ Set `enforcement.enabled: true` only after reviewing alerts and testing compatib
 | 5 | Temporary one-day login block |
 | 6 | Permanent account and IP login block **only if** `permanent-ip-ban-enabled: true`; otherwise staff review |
 
-The ladder survives restarts in `plugins/AegisAC/sanctions.yml`. Keep backups and handle appeals; a shared household, VPN exit, or proxy address can belong to multiple players. Disabled enforcement does not erase existing bans. `/aegis reset <online-player>` clears a player's sanction stage. `/aegis pardon <uuid>` clears an offline account ban; `/aegis unban-ip <address>` removes an IP ban. Set permissions carefully.
+The ladder survives restarts in `plugins/AegisAC/sanctions.yml`. It does **not** instantly ban on one detection. Keep backups and handle appeals; a shared household, VPN exit, or proxy address can belong to multiple players. Permanent IP banning is separately disabled by default; `/aegis ipban on` enables it. Disabled enforcement does not erase existing bans. `/aegis reset <online-player>` clears a player's sanction stage. `/aegis pardon <uuid>` clears an offline account ban; `/aegis unban-ip <address>` removes an IP ban.
 
 ## VPN gate
 
@@ -31,6 +31,9 @@ Optional, requires a [proxycheck.io API key](https://proxycheck.io/api/) in envi
 | --- | --- |
 | `/aegis info` | Version and credits |
 | `/aegis status` | TPS, tracked players, enabled controls |
+| `/aegis debug <online-player>` | Event counts, exemption reason, bypass status, and failed check samples |
+| `/aegis enforcement <on|off>` | Enable or disable eligible automatic sanctions, saved to config |
+| `/aegis ipban <on|off>` | Enable or disable the final IP-ban stage, saved to config |
 | `/aegis alerts` | Toggle personal alerts |
 | `/aegis inspect <online-player>` | Show alert buffers and sanction stage |
 | `/aegis reset <online-player>` | Reset that player's evidence and stage |
@@ -40,6 +43,8 @@ Optional, requires a [proxycheck.io API key](https://proxycheck.io/api/) in envi
 | `/aegis-ip <online-player>` | Show the IP address seen by Paper, privately to a permitted admin |
 
 Permissions: `aegis.admin`, `aegis.ip`, `aegis.alerts` (default op), `aegis.bypass` (default false). The server-seen IP is not necessarily a player's home IP, especially when behind a proxy. Do not share IPs publicly.
+
+If a check appears idle, inspect `/aegis debug <player>` while that player is moving and interacting. Zero event counts indicate the plugin is not seeing those Paper events; a bypass permission or an exemption reason explains some missing movement alerts. Check `/aegis info` for the loaded plugin version and `/aegis status` for sanction settings. A completed CI build does not replace testing on a running Paper server.
 
 Every 30 minutes the plugin broadcasts exactly `Made by @_adam814` by default.
 

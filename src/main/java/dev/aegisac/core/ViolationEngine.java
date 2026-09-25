@@ -17,6 +17,7 @@ public final class ViolationEngine {
 
     public void flag(Player player, PlayerData data, CheckType type, double weight, double threshold,
                      double confidence, String detail) {
+        data.failedSamples.merge(type, 1L, Long::sum);
         double next = data.buffer(type) + weight;
         data.setBuffer(type, next);
         if (next < threshold) return;

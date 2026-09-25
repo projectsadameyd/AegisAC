@@ -68,7 +68,7 @@ public final class Moderation {
     }
 
     public void onAlert(Player player, CheckType type, double confidence, String detail) {
-        if (!plugin.getConfig().getBoolean("enforcement.enabled", false) || player.hasPermission("aegis.bypass")) return;
+        if (!plugin.getConfig().getBoolean("enforcement.enabled", true) || player.hasPermission("aegis.bypass")) return;
         if (!plugin.getConfig().getStringList("enforcement.eligible-checks").contains(type.name())) return;
         if (confidence < plugin.getConfig().getDouble("enforcement.minimum-confidence", 0.98)) return;
         if (plugin.currentTps() < plugin.getConfig().getDouble("minimum-tps", 18.0)
