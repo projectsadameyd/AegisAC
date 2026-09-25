@@ -1,4 +1,4 @@
-# AegisAC 0.3.4-alpha. Speed sanctions require sustained qualifying alerts.
+# AegisAC 0.3.5-alpha. Speed sanctions require sustained qualifying alerts.
 
 broadcast-credit: true
 broadcast-credit-seconds: 1800
@@ -27,6 +27,12 @@ enforcement:
     SPEED: 5000
   evidence-window-ms: 90000
   cooldown-ms: 600000
+  # Only repeated, exceptionally large Speed movements use this shorter ladder interval.
+  severe-speed:
+    alerts-required: 2
+    evidence-window-ms: 5000
+    minimum-span-ms: 150
+    cooldown-ms: 15000
 
 # Put the key in the server process environment, never in this file.
 # A third-party service receives the connecting IP. Errors allow login.
@@ -46,6 +52,11 @@ checks:
     max-ground-horizontal-per-tick: 0.62
     max-air-horizontal-per-tick: 0.78
     buffer-to-alert: 4.0
+    severe:
+      enabled: true
+      multiplier: 3.0
+      absolute-distance: 6.0
+      minimum-alert-spacing-ms: 150
   fly:
     enabled: true
     suspicious-air-ticks: 14

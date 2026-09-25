@@ -73,6 +73,10 @@ public final class AegisCommand implements CommandExecutor {
                     + "§7; VPN gate ready: §f" + plugin.vpnGate().enabled());
             sender.sendMessage("§7Auto-sanction checks: §f" + plugin.getConfig().getStringList("enforcement.eligible-checks")
                     + "§7. Other checks produce staff alerts only.");
+            sender.sendMessage("§7Severe Speed rejection: §f" + plugin.getConfig().getBoolean("checks.speed.severe.enabled", true)
+                    + "§7; evidence: §f" + plugin.getConfig().getInt("enforcement.severe-speed.alerts-required", 2)
+                    + "§7 events; fast sanction cooldown: §f"
+                    + (plugin.getConfig().getLong("enforcement.severe-speed.cooldown-ms", 15_000L) / 1000) + "s");
             for (CheckType type : CheckType.values()) {
                 if (!plugin.getConfig().getStringList("enforcement.eligible-checks").contains(type.name())) continue;
                 double minimum = Math.max(plugin.getConfig().getDouble("alerts.minimum-confidence", 0.72),
@@ -197,7 +201,7 @@ public final class AegisCommand implements CommandExecutor {
                     + "§7, ping=§f" + target.getPing());
             sender.sendMessage("§7Movement: §f" + data.moveEvents + " §7events, §f"
                     + data.movementEvaluatedEvents + " §7evaluated, §f"
-                    + data.movementExemptEvents + " §7exempt; current reason: §f"
+                    + data.movementExemptEvents + " §7exempt, §f" + data.severeMoves + " §7rejected; current reason: §f"
                     + (reason == null ? "none" : reason));
             sender.sendMessage("§7Block interactions: §f" + data.interactionEvents + "§7; canceled as remote: §f"
                     + data.remoteBlocks + "§7; combat events: §f" + data.combatEvents);
@@ -213,6 +217,7 @@ public final class AegisCommand implements CommandExecutor {
                     + "§7; eligible=§f" + plugin.getConfig().getStringList("enforcement.eligible-checks")
                     + "§7; stage=§f" + plugin.moderation().stage(target.getUniqueId())
                     + "§7; cooldown=§f" + ((plugin.moderation().cooldownRemaining(target.getUniqueId()) + 999) / 1000) + "s"
+                    + "§7; severe cooldown=§f" + ((plugin.moderation().cooldownRemainingSevere(target.getUniqueId()) + 999) / 1000) + "s"
                     + "§7; next=§f" + plugin.moderation().nextAction(target.getUniqueId()));
             return true;
         }

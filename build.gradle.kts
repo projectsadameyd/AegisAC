@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "dev.aegisac"
-version = "0.3.4-alpha"
+version = "0.3.5-alpha"
 
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
