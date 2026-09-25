@@ -45,7 +45,7 @@ public final class ViolationEngine {
                 online.sendMessage(message);
             }
         }
-        plugin.getLogger().warning(stripColors(message));
+        AegisAudit.warning(plugin, "ALERT", stripColors(message));
         plugin.moderation().onAlert(player, type, confidence, detail);
         data.setBuffer(type, Math.max(0.0, threshold * 0.55));
     }

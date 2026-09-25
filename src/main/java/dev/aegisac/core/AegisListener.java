@@ -145,11 +145,18 @@ public final class AegisListener implements Listener {
         double distance = eye.distance(center);
         double limit = plugin.getConfig().getDouble("checks.remote-interact.max-eye-distance", 8.5);
         if (distance <= limit) return false;
+        PlayerData data = plugin.data().get(player.getUniqueId());
+        long now = System.currentTimeMillis();
+        if (now - data.lastRemoteAuditMillis >= 5000L) {
+            data.lastRemoteAuditMillis = now;
+            AegisAudit.warning(plugin, "REMOTE_BLOCKED", player.getName() + " uuid=" + player.getUniqueId()
+                    + " distance=" + fmt(distance) + " (further events are rate-limited)");
+        }
         // Other plugins can teleport players or extend reach. Cancelling is safer than
         // treating this client-side symptom as proof of a specific Freecam mod.
         if (plugin.currentTps() >= plugin.getConfig().getDouble("minimum-tps", 18.0)
                 && player.getPing() <= plugin.getConfig().getInt("maximum-ping-ms", 300)) {
-            plugin.violations().flag(player, plugin.data().get(player.getUniqueId()),
+            plugin.violations().flag(player, data,
                     CheckType.FREECAM_INTERACT, 1.0,
                     plugin.getConfig().getDouble("checks.remote-interact.buffer-to-alert", 2.0),
                     0.99, "blockDistance=" + fmt(distance));
@@ -169,12 +176,16 @@ public final class AegisListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
+        AegisAudit.info(plugin, "QUIT", event.getPlayer().getName() + " uuid=" + event.getPlayer().getUniqueId());
         plugin.data().remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        plugin.data().get(event.getPlayer().getUniqueId()).lastTeleportMillis = System.currentTimeMillis();
+        Player player = event.getPlayer();
+        plugin.data().get(player.getUniqueId()).lastTeleportMillis = System.currentTimeMillis();
+        AegisAudit.info(plugin, "JOIN", player.getName() + " [IP: " + AegisAudit.ip(player)
+                + "] uuid=" + player.getUniqueId());
     }
 
     private static String fmt(double value) {
