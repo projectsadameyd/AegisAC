@@ -1,4 +1,4 @@
-# AegisAC 0.2.0-alpha
+# AegisAC 0.2.1-alpha
 
 Paper 1.21.11 / Java 21 anti-cheat prototype. Put the built JAR in `plugins/` and restart Paper. Test on a private server before deploying to players.
 
@@ -42,6 +42,10 @@ Optional, requires a [proxycheck.io API key](https://proxycheck.io/api/) in envi
 Permissions: `aegis.admin`, `aegis.ip`, `aegis.alerts` (default op), `aegis.bypass` (default false). The server-seen IP is not necessarily a player's home IP, especially when behind a proxy. Do not share IPs publicly.
 
 Every 30 minutes the plugin broadcasts exactly `Made by @_adam814` by default.
+
+## Console audit
+
+AegisAC logs `[AUDIT]` entries for joins, quits, check alerts, blocked remote interactions, sanctions, VPN login decisions, login denials, and admin changes. Join entries show the address Paper sees beside the player name, for example: `[AUDIT] JOIN Steve [IP: 203.0.113.42] uuid=...`. IP addresses appear only in the server console and server logs; the normal public join message stays as configured by Paper. If you use a proxy, configure secure IP forwarding or the address may be the proxy's. Restrict access to server logs because they contain player IPs. Remote-interaction cancellation messages are limited to one per player every five seconds; normal movement events are not logged.
 
 ## Build
 

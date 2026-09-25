@@ -24,12 +24,13 @@ public final class AegisAC extends JavaPlugin {
         if (ipCommand != null) ipCommand.setExecutor(new AegisCommand(this));
 
         scheduleCreditBroadcast();
-        getLogger().info("AegisAC enabled for Paper 1.21.11. Automatic sanctions: " + getConfig().getBoolean("enforcement.enabled", false));
+        AegisAudit.info(this, "STARTUP", "Paper 1.21.11; automatic sanctions="
+                + getConfig().getBoolean("enforcement.enabled", false) + "; VPN gate=" + vpnGate.enabled());
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("AegisAC disabled.");
+        AegisAudit.info(this, "SHUTDOWN", "AegisAC disabled");
     }
 
     private void scheduleCreditBroadcast() {

@@ -36,35 +36,35 @@ jobs:
 
       - name: Validate JAR
         run: |
-          JAR='target/AegisAC-0.2.0-alpha.jar'
+          JAR='target/AegisAC-0.2.1-alpha.jar'
           test -s "$JAR"
           jar tf "$JAR" | grep -q 'dev/aegisac/core/AegisAC.class'
           jar tf "$JAR" | grep -q '^plugin.yml$'
           unzip -t "$JAR"
-          sha256sum "$JAR" | tee target/AegisAC-0.2.0-alpha.jar.sha256
+          sha256sum "$JAR" | tee target/AegisAC-0.2.1-alpha.jar.sha256
 
       - name: Upload CI build
         uses: actions/upload-artifact@v4
         with:
-          name: AegisAC-0.2.0-alpha
+          name: AegisAC-0.2.1-alpha
           path: |
-            target/AegisAC-0.2.0-alpha.jar
-            target/AegisAC-0.2.0-alpha.jar.sha256
+            target/AegisAC-0.2.1-alpha.jar
+            target/AegisAC-0.2.1-alpha.jar.sha256
 
       - name: Create/update prerelease and upload verified artifacts
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG='v0.2.0-alpha'
+          TAG='v0.2.1-alpha'
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" target/AegisAC-0.2.0-alpha.jar target/AegisAC-0.2.0-alpha.jar.sha256 --clobber
+            gh release upload "$TAG" target/AegisAC-0.2.1-alpha.jar target/AegisAC-0.2.1-alpha.jar.sha256 --clobber
           else
             gh release create "$TAG" \
               --target "$GITHUB_SHA" \
-              --title 'AegisAC 0.2.0-alpha' \
+              --title 'AegisAC 0.2.1-alpha' \
               --prerelease \
-              --notes 'Experimental Paper 1.21.11 build with remote interaction guard and optional moderation/VPN controls. Automatic bans and kicks remain disabled by default. Test on a private server.' \
-              target/AegisAC-0.2.0-alpha.jar \
-              target/AegisAC-0.2.0-alpha.jar.sha256
+              --notes 'Paper 1.21.11 alpha with console audit entries and join IP logging. Sanctions and VPN controls remain opt-in. IPs are printed only to server console/logs. Test on a private server.' \
+              target/AegisAC-0.2.1-alpha.jar \
+              target/AegisAC-0.2.1-alpha.jar.sha256
           fi

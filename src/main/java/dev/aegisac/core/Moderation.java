@@ -52,15 +52,18 @@ public final class Moderation {
         String ip = event.getAddress().getHostAddress();
         if (ipBans.containsKey(ip)) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, "This IP is banned by AegisAC. Contact server staff to appeal.");
+            AegisAudit.warning(plugin, "LOGIN_DENIED", event.getName() + " ip=" + ip + " reason=ip-ban");
             return;
         }
         Record record = records.get(event.getUniqueId());
         if (record == null) return;
         if (record.permanent()) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, "Account banned by AegisAC. Contact server staff to appeal.");
+            AegisAudit.warning(plugin, "LOGIN_DENIED", event.getName() + " ip=" + ip + " reason=account-ban");
         } else if (record.until() > System.currentTimeMillis()) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED,
                     "Temporarily blocked by AegisAC until " + java.time.Instant.ofEpochMilli(record.until()) + ". Contact staff to appeal.");
+            AegisAudit.warning(plugin, "LOGIN_DENIED", event.getName() + " ip=" + ip + " reason=temp-ban until=" + record.until());
         }
     }
 
@@ -86,11 +89,15 @@ public final class Moderation {
         if (stage <= 3) {
             records.put(uuid, new Record(stage, 0, false, reason, ""));
             save();
+            AegisAudit.warning(plugin, "SANCTION", player.getName() + " uuid=" + uuid + " stage=" + stage
+                    + " action=kick reason=" + reason);
             player.kickPlayer("AegisAC: repeated suspicious interactions (" + stage + "/3). Contact staff if this is a mistake.");
         } else if (stage <= 5) {
             long duration = stage == 4 ? 3_600_000L : 86_400_000L;
             records.put(uuid, new Record(stage, now + duration, false, reason, ""));
             save();
+            AegisAudit.warning(plugin, "SANCTION", player.getName() + " uuid=" + uuid + " stage=" + stage
+                    + " action=temp-ban until=" + (now + duration) + " reason=" + reason);
             player.kickPlayer("AegisAC: temporary restriction until " + java.time.Instant.ofEpochMilli(now + duration)
                     + ". Contact staff to appeal.");
         } else if (plugin.getConfig().getBoolean("enforcement.permanent-ip-ban-enabled", false)) {
@@ -100,10 +107,12 @@ public final class Moderation {
             records.put(uuid, new Record(stage, 0, true, reason, ip));
             ipBans.put(ip, true);
             save();
+            AegisAudit.warning(plugin, "SANCTION", player.getName() + " uuid=" + uuid + " ip=" + ip
+                    + " stage=" + stage + " action=permanent-ip-ban reason=" + reason);
             player.kickPlayer("AegisAC: banned. Contact server staff to appeal.");
         } else {
-            plugin.getLogger().warning("Final sanction requires staff review for " + player.getName()
-                    + "; permanent IP banning is disabled. Evidence: " + reason);
+            AegisAudit.warning(plugin, "REVIEW_REQUIRED", player.getName() + " uuid=" + uuid
+                    + " permanent IP banning is disabled; reason=" + reason);
         }
     }
 

@@ -14,6 +14,7 @@ public final class PlayerData {
     long lastTeleportMillis;
     long lastVelocityMillis;
     long lastDamageMillis;
+    long lastRemoteAuditMillis;
     int airTicks;
     int stableGroundTicks;
     double lastVerticalDelta;

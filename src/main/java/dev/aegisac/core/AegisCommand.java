@@ -34,6 +34,7 @@ public final class AegisCommand implements CommandExecutor {
             sender.sendMessage(address == null || address.getAddress() == null
                     ? "§cNo address available." : "§7Server-seen IP for §f" + target.getName() + "§7: §f"
                     + address.getAddress().getHostAddress() + " §8(proxy configuration affects this value)");
+            AegisAudit.info(plugin, "IP_LOOKUP", "actor=" + sender.getName() + " target=" + target.getName());
             return true;
         }
         if (!sender.hasPermission("aegis.admin")) {
@@ -52,12 +53,14 @@ public final class AegisCommand implements CommandExecutor {
             }
             boolean enabled = plugin.violations().toggleAlerts(player);
             sender.sendMessage(enabled ? "§aAegis alerts enabled." : "§cAegis alerts disabled.");
+            AegisAudit.info(plugin, "ALERTS_TOGGLE", "actor=" + sender.getName() + " enabled=" + enabled);
             return true;
         }
         if (args[0].equalsIgnoreCase("reload")) {
             plugin.reloadConfig();
             plugin.vpnGate().reload();
             sender.sendMessage("§aAegisAC configuration reloaded.");
+            AegisAudit.info(plugin, "CONFIG_RELOAD", "actor=" + sender.getName());
             return true;
         }
         if (args[0].equalsIgnoreCase("status")) {
@@ -92,6 +95,8 @@ public final class AegisCommand implements CommandExecutor {
             plugin.moderation().reset(target.getUniqueId());
             plugin.data().remove(target.getUniqueId());
             sender.sendMessage("§aCleared AegisAC evidence and sanction stage for " + target.getName() + ".");
+            AegisAudit.warning(plugin, "SANCTION_RESET", "actor=" + sender.getName()
+                    + " target=" + target.getName() + " uuid=" + target.getUniqueId());
             return true;
         }
         if (args[0].equalsIgnoreCase("pardon") && args.length == 2) {
@@ -100,14 +105,17 @@ public final class AegisCommand implements CommandExecutor {
                 plugin.moderation().reset(uuid);
                 plugin.data().remove(uuid);
                 sender.sendMessage("§aCleared AegisAC sanctions for UUID " + uuid + ".");
+                AegisAudit.warning(plugin, "PARDON", "actor=" + sender.getName() + " uuid=" + uuid);
             } catch (IllegalArgumentException ex) {
                 sender.sendMessage("§cProvide the exact account UUID.");
             }
             return true;
         }
         if (args[0].equalsIgnoreCase("unban-ip") && args.length == 2) {
-            sender.sendMessage(plugin.moderation().unbanIp(args[1]) ? "§aRemoved the IP block."
+            boolean removed = plugin.moderation().unbanIp(args[1]);
+            sender.sendMessage(removed ? "§aRemoved the IP block."
                     : "§cNo AegisAC IP block found for that address.");
+            if (removed) AegisAudit.warning(plugin, "IP_UNBAN", "actor=" + sender.getName() + " ip=" + args[1]);
             return true;
         }
         sender.sendMessage("§7Usage: §f/aegis <alerts|status|inspect|reset|pardon|unban-ip|reload|info>");
