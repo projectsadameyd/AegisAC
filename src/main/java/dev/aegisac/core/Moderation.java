@@ -95,8 +95,9 @@ public final class Moderation {
         }
         long now = System.currentTimeMillis();
         UUID uuid = player.getUniqueId();
-        if (now - lastAction.getOrDefault(uuid, 0L) < plugin.getConfig().getLong("enforcement.cooldown-ms", 600_000L)) {
-            data.sanctionGate.put(type, "cooldown after previous sanction");
+        long remaining = cooldownRemaining(uuid);
+        if (remaining > 0L) {
+            data.sanctionGate.put(type, "cooldown " + ((remaining + 999) / 1000) + "s; next=" + nextAction(uuid));
             return;
         }
         Deque<Long> hits = evidence.computeIfAbsent(uuid, ignored -> new EnumMap<>(CheckType.class))
@@ -152,6 +153,13 @@ public final class Moderation {
 
     public int stage(UUID uuid) { return records.getOrDefault(uuid, new Record(0, 0, false, "", "")).stage(); }
     public String reason(UUID uuid) { return records.getOrDefault(uuid, new Record(0, 0, false, "", "")).lastReason(); }
+    public String nextAction(UUID uuid) {
+        int current = stage(uuid);
+        if (current < 3) return "kick " + (current + 1) + "/3";
+        if (current == 3) return "temporary ban (one hour)";
+        if (current == 4) return "temporary ban (one day)";
+        return "IP ban only on remote interaction; otherwise staff review";
+    }
     public long cooldownRemaining(UUID uuid) {
         long end = lastAction.getOrDefault(uuid, 0L) + plugin.getConfig().getLong("enforcement.cooldown-ms", 600_000L);
         return Math.max(0L, end - System.currentTimeMillis());

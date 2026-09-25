@@ -70,7 +70,7 @@ public final class VpnGate {
             String url = "https://proxycheck.io/v2/" + URLEncoder.encode(ip, StandardCharsets.UTF_8)
                     + "?key=" + URLEncoder.encode(apiKey, StandardCharsets.UTF_8) + "&vpn=2";
             HttpRequest request = HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofMillis(1500))
-                    .header("User-Agent", "AegisAC/0.3.3").GET().build();
+                    .header("User-Agent", "AegisAC/0.3.4").GET().build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200 || response.body().length() > 16_384) return null;
             JsonObject root = JsonParser.parseString(response.body()).getAsJsonObject();
