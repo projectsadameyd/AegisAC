@@ -7,6 +7,7 @@ public enum CheckType {
     REACH("Reach", "A"),
     AUTOCLICKER("AutoClicker", "A"),
     FASTPLACE("FastPlace", "A"),
+    FREECAM_INTERACT("RemoteInteract", "A"),
     VELOCITY("Velocity", "A");
 
     private final String display;

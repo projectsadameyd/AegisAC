@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.*;
@@ -115,6 +116,55 @@ public final class AegisListener implements Listener {
         } else {
             data.decay(CheckType.FASTPLACE, 0.12);
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onRemoteBreak(BlockBreakEvent event) {
+        if (remote(event.getPlayer(), event.getBlock().getLocation().add(0.5, 0.5, 0.5))) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onRemotePlace(BlockPlaceEvent event) {
+        if (remote(event.getPlayer(), event.getBlockPlaced().getLocation().add(0.5, 0.5, 0.5))) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onRemoteInteract(PlayerInteractEvent event) {
+        if (event.getClickedBlock() != null
+                && remote(event.getPlayer(), event.getClickedBlock().getLocation().add(0.5, 0.5, 0.5))) {
+            event.setCancelled(true);
+        }
+    }
+
+    private boolean remote(Player player, Location center) {
+        if (!plugin.getConfig().getBoolean("checks.remote-interact.enabled", true)
+                || player.hasPermission("aegis.bypass") || player.getGameMode().name().equals("CREATIVE")
+                || player.getGameMode().name().equals("SPECTATOR")) return false;
+        Location eye = player.getEyeLocation();
+        if (eye.getWorld() != center.getWorld()) return false;
+        double distance = eye.distance(center);
+        double limit = plugin.getConfig().getDouble("checks.remote-interact.max-eye-distance", 8.5);
+        if (distance <= limit) return false;
+        // Other plugins can teleport players or extend reach. Cancelling is safer than
+        // treating this client-side symptom as proof of a specific Freecam mod.
+        if (plugin.currentTps() >= plugin.getConfig().getDouble("minimum-tps", 18.0)
+                && player.getPing() <= plugin.getConfig().getInt("maximum-ping-ms", 300)) {
+            plugin.violations().flag(player, plugin.data().get(player.getUniqueId()),
+                    CheckType.FREECAM_INTERACT, 1.0,
+                    plugin.getConfig().getDouble("checks.remote-interact.buffer-to-alert", 2.0),
+                    0.99, "blockDistance=" + fmt(distance));
+        }
+        return true;
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPreLoginBan(AsyncPlayerPreLoginEvent event) {
+        plugin.moderation().checkLogin(event);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPreLoginVpn(AsyncPlayerPreLoginEvent event) {
+        plugin.vpnGate().checkLogin(event);
     }
 
     @EventHandler

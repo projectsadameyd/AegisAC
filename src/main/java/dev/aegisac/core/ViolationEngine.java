@@ -46,6 +46,7 @@ public final class ViolationEngine {
             }
         }
         plugin.getLogger().warning(stripColors(message));
+        plugin.moderation().onAlert(player, type, confidence, detail);
         data.setBuffer(type, Math.max(0.0, threshold * 0.55));
     }
 
