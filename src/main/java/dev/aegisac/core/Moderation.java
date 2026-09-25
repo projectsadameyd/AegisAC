@@ -104,12 +104,13 @@ public final class Moderation {
         long window = plugin.getConfig().getLong("enforcement.evidence-window-ms", 90_000L);
         int required = Math.max(3, plugin.getConfig().getInt("enforcement.alerts-required-by-check." + type.name(),
                 plugin.getConfig().getInt("enforcement.alerts-required", 4)));
-        long minimumSpan = type == CheckType.SPEED
-                ? plugin.getConfig().getLong("enforcement.minimum-evidence-span-ms-by-check.SPEED", 5000L) : 0L;
+        long minimumSpan = Math.max(0L, plugin.getConfig().getLong(
+                "enforcement.minimum-evidence-span-ms-by-check." + type.name(),
+                type == CheckType.SPEED ? 5000L : 0L));
         if (!SanctionEvidence.recordAndReady(hits, now, window, required, minimumSpan)) {
             data.sanctionGate.put(type, "evidence " + hits.size() + "/" + required
                     + " alerts; span=" + (hits.isEmpty() ? 0 : now - hits.peekFirst()) + "ms"
-                    + (type == CheckType.SPEED ? " (needs " + minimumSpan + "ms)" : ""));
+                    + (minimumSpan > 0 ? " (needs " + minimumSpan + "ms)" : ""));
             return;
         }
         hits.clear();
@@ -132,7 +133,8 @@ public final class Moderation {
                     + " action=temp-ban until=" + (now + duration) + " reason=" + reason);
             player.kickPlayer("AegisAC: temporary restriction until " + java.time.Instant.ofEpochMilli(now + duration)
                     + ". Contact staff to appeal.");
-        } else if (type != CheckType.SPEED && plugin.getConfig().getBoolean("enforcement.permanent-ip-ban-enabled", false)) {
+        } else if (type == CheckType.FREECAM_INTERACT
+                && plugin.getConfig().getBoolean("enforcement.permanent-ip-ban-enabled", false)) {
             InetSocketAddress address = player.getAddress();
             if (address == null || address.getAddress() == null) return;
             String ip = address.getAddress().getHostAddress();

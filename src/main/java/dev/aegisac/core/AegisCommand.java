@@ -64,28 +64,75 @@ public final class AegisCommand implements CommandExecutor {
             return true;
         }
         if (args[0].equalsIgnoreCase("status")) {
-            sender.sendMessage("§bAegisAC §7tracking §f" + plugin.data().size() + " §7player record(s). TPS: §f"
+            sender.sendMessage("§bAegisAC §f" + plugin.getDescription().getVersion()
+                    + " §7tracking §f" + plugin.data().size() + " §7player record(s). TPS: §f"
                     + String.format(java.util.Locale.ROOT, "%.2f", plugin.currentTps()));
             sender.sendMessage("§7Sanctions: §f" + plugin.getConfig().getBoolean("enforcement.enabled", true)
                     + "§7; permanent IP bans: §f" + plugin.getConfig().getBoolean("enforcement.permanent-ip-ban-enabled", false)
                     + "§7; VPN gate ready: §f" + plugin.vpnGate().enabled());
             sender.sendMessage("§7Auto-sanction checks: §f" + plugin.getConfig().getStringList("enforcement.eligible-checks")
                     + "§7. Other checks produce staff alerts only.");
+            for (CheckType type : CheckType.values()) {
+                if (!plugin.getConfig().getStringList("enforcement.eligible-checks").contains(type.name())) continue;
+                double minimum = Math.max(plugin.getConfig().getDouble("alerts.minimum-confidence", 0.72),
+                        plugin.getConfig().getDouble("enforcement.minimum-confidence-by-check." + type.name(),
+                                plugin.getConfig().getDouble("enforcement.minimum-confidence", 0.98)));
+                if (minimum > EnforcementProfiles.get(type).maximumScore() + 1.0E-9)
+                    sender.sendMessage("§c" + type.display() + " can never sanction: effective required score "
+                            + Math.round(minimum * 100) + "% exceeds maximum "
+                            + Math.round(EnforcementProfiles.get(type).maximumScore() * 100)
+                            + "%. Check alerts.minimum-confidence and run /aegis enforcement "
+                            + type.name().toLowerCase(java.util.Locale.ROOT) + " on.");
+            }
+            if (plugin.getConfig().getBoolean("vpn.enabled", false) && !plugin.vpnGate().enabled())
+                sender.sendMessage("§cVPN blocking is configured but unavailable: set the VPN API key environment variable and restart.");
             return true;
         }
-        if (args[0].equalsIgnoreCase("enforcement") && args.length == 3 && args[1].equalsIgnoreCase("speed")) {
+        if (args[0].equalsIgnoreCase("enforcement") && args.length == 3) {
             if (!args[2].equalsIgnoreCase("on") && !args[2].equalsIgnoreCase("off")) {
-                sender.sendMessage("§7Usage: §f/aegis enforcement speed <on|off>");
+                sender.sendMessage("§7Usage: §f/aegis enforcement <all|check> <on|off>");
+                return true;
+            }
+            boolean enable = args[2].equalsIgnoreCase("on");
+            if (args[1].equalsIgnoreCase("all")) {
+                if (enable) {
+                    java.util.List<String> all = new java.util.ArrayList<>();
+                    for (CheckType type : CheckType.values()) {
+                        all.add(type.name());
+                        setEnforcementProfile(type);
+                    }
+                    plugin.getConfig().set("enforcement.eligible-checks", all);
+                }
+                plugin.getConfig().set("enforcement.enabled", enable);
+                plugin.saveConfig();
+                sender.sendMessage(enable
+                        ? "§eAll check sanctions enabled with per-check thresholds. Three kicks precede temporary bans."
+                        : "§7All automatic sanctions disabled; eligible checks remain saved for later use.");
+                sender.sendMessage("§7IP bans are separate; VPN blocking requires a configured API key. Run /aegis status.");
+                AegisAudit.warning(plugin, "ALL_ENFORCEMENT", "actor=" + sender.getName() + " enabled=" + enable);
+                return true;
+            }
+            CheckType selected = null;
+            for (CheckType type : CheckType.values()) {
+                if (type.name().equalsIgnoreCase(args[1])) selected = type;
+            }
+            if (selected == null) {
+                sender.sendMessage("§cUnknown check. Use /aegis status or /aegis enforcement all on.");
                 return true;
             }
             java.util.List<String> checks = new java.util.ArrayList<>(plugin.getConfig().getStringList("enforcement.eligible-checks"));
-            checks.removeIf(name -> name.equalsIgnoreCase("SPEED"));
-            if (args[2].equalsIgnoreCase("on")) checks.add("SPEED");
+            CheckType check = selected;
+            checks.removeIf(name -> name.equalsIgnoreCase(check.name()));
+            if (enable) {
+                checks.add(selected.name());
+                setEnforcementProfile(selected);
+            }
             plugin.getConfig().set("enforcement.eligible-checks", checks);
             plugin.saveConfig();
-            sender.sendMessage("§7Speed sanctions " + (args[2].equalsIgnoreCase("on") ? "enabled" : "disabled")
-                    + "§7. Requires eight qualifying alerts over at least five seconds.");
-            AegisAudit.warning(plugin, "SPEED_ENFORCEMENT", "actor=" + sender.getName() + " enabled=" + args[2]);
+            sender.sendMessage("§7" + selected.display() + " sanctions " + (enable ? "enabled" : "disabled")
+                    + "§7. Global enforcement=" + plugin.getConfig().getBoolean("enforcement.enabled", true));
+            AegisAudit.warning(plugin, "CHECK_ENFORCEMENT", "actor=" + sender.getName() + " check=" + selected.name()
+                    + " enabled=" + enable);
             return true;
         }
         if (args[0].equalsIgnoreCase("enforcement") && args.length == 2) {
@@ -124,7 +171,7 @@ public final class AegisCommand implements CommandExecutor {
             String reason = WorldUtil.movementExemptionReason(target, data,
                     plugin.getConfig().getDouble("minimum-tps", 18.0), plugin.currentTps(),
                     plugin.getConfig().getInt("maximum-ping-ms", 300));
-            sender.sendMessage("§bAegis debug: §f" + target.getName() + " §7bypass=§f"
+            sender.sendMessage("§bAegis debug §7v" + plugin.getDescription().getVersion() + ": §f" + target.getName() + " §7bypass=§f"
                     + target.hasPermission("aegis.bypass") + "§7, mode=§f" + target.getGameMode()
                     + "§7, ping=§f" + target.getPing());
             sender.sendMessage("§7Movement: §f" + data.moveEvents + " §7events, §f"
@@ -194,7 +241,14 @@ public final class AegisCommand implements CommandExecutor {
             if (removed) AegisAudit.warning(plugin, "IP_UNBAN", "actor=" + sender.getName() + " ip=" + args[1]);
             return true;
         }
-        sender.sendMessage("§7Usage: §f/aegis <alerts|status|debug|enforcement [speed] <on|off>|ipban|inspect|reset|pardon|unban-ip|reload|info>");
+        sender.sendMessage("§7Usage: §f/aegis <alerts|status|debug|enforcement [all|check] <on|off>|ipban|inspect|reset|pardon|unban-ip|reload|info>");
         return true;
+    }
+
+    private void setEnforcementProfile(CheckType type) {
+        EnforcementProfiles.Profile profile = EnforcementProfiles.get(type);
+        plugin.getConfig().set("enforcement.minimum-confidence-by-check." + type.name(), profile.minimumScore());
+        plugin.getConfig().set("enforcement.alerts-required-by-check." + type.name(), profile.requiredAlerts());
+        plugin.getConfig().set("enforcement.minimum-evidence-span-ms-by-check." + type.name(), profile.minimumSpanMillis());
     }
 }
