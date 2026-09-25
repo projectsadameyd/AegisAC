@@ -1,4 +1,4 @@
-# AegisAC 0.3.1-alpha. Speed sanctions require repeated, high-confidence alerts on stable ground.
+# AegisAC 0.3.2-alpha. Speed sanctions require sustained qualifying alerts.
 
 broadcast-credit: true
 broadcast-credit-seconds: 1800
@@ -23,6 +23,8 @@ enforcement:
     SPEED: 0.92
   alerts-required-by-check:
     SPEED: 8
+  minimum-evidence-span-ms-by-check:
+    SPEED: 5000
   evidence-window-ms: 90000
   cooldown-ms: 600000
 

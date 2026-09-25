@@ -84,12 +84,8 @@ public final class Moderation {
         double minimum = plugin.getConfig().getDouble("enforcement.minimum-confidence-by-check." + type.name(),
                 plugin.getConfig().getDouble("enforcement.minimum-confidence", 0.98));
         if (confidence < minimum) {
-            data.sanctionGate.put(type, "confidence " + Math.round(confidence * 100)
+            data.sanctionGate.put(type, "score " + Math.round(confidence * 100)
                     + "% below " + Math.round(minimum * 100) + "%");
-            return;
-        }
-        if (type == CheckType.SPEED && data.stableGroundTicks < 8) {
-            data.sanctionGate.put(type, "need 8 stable ground ticks");
             return;
         }
         if (plugin.currentTps() < plugin.getConfig().getDouble("minimum-tps", 18.0)
@@ -106,12 +102,14 @@ public final class Moderation {
         Deque<Long> hits = evidence.computeIfAbsent(uuid, ignored -> new EnumMap<>(CheckType.class))
                 .computeIfAbsent(type, ignored -> new ArrayDeque<>());
         long window = plugin.getConfig().getLong("enforcement.evidence-window-ms", 90_000L);
-        while (!hits.isEmpty() && now - hits.peekFirst() > window) hits.removeFirst();
-        hits.addLast(now);
         int required = Math.max(3, plugin.getConfig().getInt("enforcement.alerts-required-by-check." + type.name(),
                 plugin.getConfig().getInt("enforcement.alerts-required", 4)));
-        if (hits.size() < required) {
-            data.sanctionGate.put(type, "evidence " + hits.size() + "/" + required + " alerts in window");
+        long minimumSpan = type == CheckType.SPEED
+                ? plugin.getConfig().getLong("enforcement.minimum-evidence-span-ms-by-check.SPEED", 5000L) : 0L;
+        if (!SanctionEvidence.recordAndReady(hits, now, window, required, minimumSpan)) {
+            data.sanctionGate.put(type, "evidence " + hits.size() + "/" + required
+                    + " alerts; span=" + (hits.isEmpty() ? 0 : now - hits.peekFirst()) + "ms"
+                    + (type == CheckType.SPEED ? " (needs " + minimumSpan + "ms)" : ""));
             return;
         }
         hits.clear();
@@ -152,6 +150,10 @@ public final class Moderation {
 
     public int stage(UUID uuid) { return records.getOrDefault(uuid, new Record(0, 0, false, "", "")).stage(); }
     public String reason(UUID uuid) { return records.getOrDefault(uuid, new Record(0, 0, false, "", "")).lastReason(); }
+    public long cooldownRemaining(UUID uuid) {
+        long end = lastAction.getOrDefault(uuid, 0L) + plugin.getConfig().getLong("enforcement.cooldown-ms", 600_000L);
+        return Math.max(0L, end - System.currentTimeMillis());
+    }
 
     public void reset(UUID uuid) {
         Record removed = records.remove(uuid);

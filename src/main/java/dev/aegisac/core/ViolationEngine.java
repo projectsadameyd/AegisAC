@@ -38,7 +38,7 @@ public final class ViolationEngine {
         String message = "§8[§bAegis§8] §f" + player.getName()
                 + " §7failed §c" + type.display() + " " + type.variant()
                 + " §8(§7buffer=§f" + round(next)
-                + "§7, confidence=§f" + Math.round(confidence * 100.0) + "%"
+                + "§7, heuristic score=§f" + Math.round(confidence * 100.0) + "%"
                 + "§7, ping=§f" + ping + "ms"
                 + "§7, tps=§f" + round(tps)
                 + "§7, " + detail + "§8)";

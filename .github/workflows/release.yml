@@ -34,37 +34,43 @@ jobs:
       - name: Compile and package
         run: mvn --batch-mode --no-transfer-progress clean package
 
+      - name: Verify sustained sanction evidence
+        run: |
+          mkdir -p target/test-classes
+          javac -cp target/classes -d target/test-classes src/test/java/dev/aegisac/core/SanctionEvidenceTest.java
+          java -ea -cp target/classes:target/test-classes dev.aegisac.core.SanctionEvidenceTest
+
       - name: Validate JAR
         run: |
-          JAR='target/AegisAC-0.3.1-alpha.jar'
+          JAR='target/AegisAC-0.3.2-alpha.jar'
           test -s "$JAR"
           jar tf "$JAR" | grep -q 'dev/aegisac/core/AegisAC.class'
           jar tf "$JAR" | grep -q '^plugin.yml$'
           unzip -t "$JAR"
-          sha256sum "$JAR" | tee target/AegisAC-0.3.1-alpha.jar.sha256
+          sha256sum "$JAR" | tee target/AegisAC-0.3.2-alpha.jar.sha256
 
       - name: Upload CI build
         uses: actions/upload-artifact@v4
         with:
-          name: AegisAC-0.3.1-alpha
+          name: AegisAC-0.3.2-alpha
           path: |
-            target/AegisAC-0.3.1-alpha.jar
-            target/AegisAC-0.3.1-alpha.jar.sha256
+            target/AegisAC-0.3.2-alpha.jar
+            target/AegisAC-0.3.2-alpha.jar.sha256
 
       - name: Create/update prerelease and upload verified artifacts
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG='v0.3.1-alpha'
+          TAG='v0.3.2-alpha'
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" target/AegisAC-0.3.1-alpha.jar target/AegisAC-0.3.1-alpha.jar.sha256 --clobber
+            gh release upload "$TAG" target/AegisAC-0.3.2-alpha.jar target/AegisAC-0.3.2-alpha.jar.sha256 --clobber
           else
             gh release create "$TAG" \
               --target "$GITHUB_SHA" \
-              --title 'AegisAC 0.3.1-alpha' \
+              --title 'AegisAC 0.3.2-alpha' \
               --prerelease \
-              --notes 'Paper 1.21.11 alpha fixes the debug exemption counter and adds gated Speed sanctions for repeated high-confidence grounded alerts. Existing config.yml eligible-checks are retained; use /aegis enforcement speed on to opt in. Speed can kick and temp-block but cannot permanently IP-ban. Test on a private server.' \
-              target/AegisAC-0.3.1-alpha.jar \
-              target/AegisAC-0.3.1-alpha.jar.sha256
+              --notes 'Paper 1.21.11 alpha fixes a Speed enforcement gate that discarded alerts whenever the player lacked eight consecutive grounded ticks. Eight qualifying alerts in 90 seconds spanning at least five seconds now advance the sanction stage. Debug shows stage and cooldown. Existing config.yml eligible-checks are retained; use /aegis enforcement speed on if needed. Speed may kick and temp-block but never permanently IP-ban. Test on a private server.' \
+              target/AegisAC-0.3.2-alpha.jar \
+              target/AegisAC-0.3.2-alpha.jar.sha256
           fi
