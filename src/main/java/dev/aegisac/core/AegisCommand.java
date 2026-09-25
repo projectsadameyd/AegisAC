@@ -68,7 +68,8 @@ public final class AegisCommand implements CommandExecutor {
                     + " §7tracking §f" + plugin.data().size() + " §7player record(s). TPS: §f"
                     + String.format(java.util.Locale.ROOT, "%.2f", plugin.currentTps()));
             sender.sendMessage("§7Sanctions: §f" + plugin.getConfig().getBoolean("enforcement.enabled", true)
-                    + "§7; permanent IP bans: §f" + plugin.getConfig().getBoolean("enforcement.permanent-ip-ban-enabled", false)
+                    + "§7; cooldown: §f" + (plugin.getConfig().getLong("enforcement.cooldown-ms", 600_000L) / 1000) + "s"
+                    + "§7; remote-interaction IP bans: §f" + plugin.getConfig().getBoolean("enforcement.permanent-ip-ban-enabled", false)
                     + "§7; VPN gate ready: §f" + plugin.vpnGate().enabled());
             sender.sendMessage("§7Auto-sanction checks: §f" + plugin.getConfig().getStringList("enforcement.eligible-checks")
                     + "§7. Other checks produce staff alerts only.");
@@ -86,6 +87,26 @@ public final class AegisCommand implements CommandExecutor {
             }
             if (plugin.getConfig().getBoolean("vpn.enabled", false) && !plugin.vpnGate().enabled())
                 sender.sendMessage("§cVPN blocking is configured but unavailable: set the VPN API key environment variable and restart.");
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("enforcement") && args.length == 3
+                && args[1].equalsIgnoreCase("cooldown")) {
+            int seconds;
+            try {
+                seconds = Integer.parseInt(args[2]);
+            } catch (NumberFormatException ex) {
+                sender.sendMessage("§cUsage: /aegis enforcement cooldown <0-3600 seconds>");
+                return true;
+            }
+            if (seconds < 0 || seconds > 3600) {
+                sender.sendMessage("§cCooldown must be between 0 and 3600 seconds.");
+                return true;
+            }
+            plugin.getConfig().set("enforcement.cooldown-ms", seconds * 1000L);
+            plugin.saveConfig();
+            sender.sendMessage("§aSanction cooldown set to " + seconds + "s, effective immediately, including for existing cooldowns.");
+            if (seconds == 0) sender.sendMessage("§eZero cooldown is intended for testing on a private server. Set it back when done.");
+            AegisAudit.warning(plugin, "ENFORCEMENT_COOLDOWN", "actor=" + sender.getName() + " seconds=" + seconds);
             return true;
         }
         if (args[0].equalsIgnoreCase("enforcement") && args.length == 3) {
@@ -191,7 +212,8 @@ public final class AegisCommand implements CommandExecutor {
             sender.sendMessage("§7Sanctions=§f" + plugin.getConfig().getBoolean("enforcement.enabled", true)
                     + "§7; eligible=§f" + plugin.getConfig().getStringList("enforcement.eligible-checks")
                     + "§7; stage=§f" + plugin.moderation().stage(target.getUniqueId())
-                    + "§7; cooldown=§f" + (plugin.moderation().cooldownRemaining(target.getUniqueId()) / 1000) + "s");
+                    + "§7; cooldown=§f" + ((plugin.moderation().cooldownRemaining(target.getUniqueId()) + 999) / 1000) + "s"
+                    + "§7; next=§f" + plugin.moderation().nextAction(target.getUniqueId()));
             return true;
         }
         if (args[0].equalsIgnoreCase("inspect") && args.length == 2) {
@@ -241,7 +263,7 @@ public final class AegisCommand implements CommandExecutor {
             if (removed) AegisAudit.warning(plugin, "IP_UNBAN", "actor=" + sender.getName() + " ip=" + args[1]);
             return true;
         }
-        sender.sendMessage("§7Usage: §f/aegis <alerts|status|debug|enforcement [all|check] <on|off>|ipban|inspect|reset|pardon|unban-ip|reload|info>");
+        sender.sendMessage("§7Usage: §f/aegis <alerts|status|debug|enforcement [all|check|cooldown] ...|ipban|inspect|reset|pardon|unban-ip|reload|info>");
         return true;
     }
 
