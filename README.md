@@ -1,4 +1,4 @@
-# AegisAC 0.3.1-alpha
+# AegisAC 0.3.2-alpha
 
 Paper 1.21.11 / Java 21 anti-cheat prototype. Put the built JAR in `plugins/` and restart Paper. Test on a private server before deploying to players.
 
@@ -6,11 +6,11 @@ Paper 1.21.11 / Java 21 anti-cheat prototype. Put the built JAR in `plugins/` an
 
 No server plugin can guarantee detection of every cheat, instant detection, zero false positives, or superior performance to GrimAC without controlled benchmarks. **Passive Freecam is not detectable by this plugin**: a camera moving only on the client sends no distinctive movement to Paper. AegisAC immediately cancels block break, placement, and interaction **beyond the player's server-side block-reach attribute plus a safety margin**. This stops a class of remote actions, not passive viewing. Paper's [built-in Anti-Xray](https://docs.papermc.io/paper/anti-xray/) reduces ore information sent to clients; it does not remove Freecam or hide every visible build.
 
-Speed, Fly, Timer, Reach, AutoClicker, FastPlace, and Velocity checks generate staff alerts. Only repeated high-confidence Speed alerts on stable ground and remote block interactions are eligible for staged sanctions on new installations. Fly and the other heuristic checks do not automatically escalate. A Speed failed sample or a current buffer above threshold is **not** a sanction event; the debug command shows alert count, confidence, and the gate that stopped escalation.
+Speed, Fly, Timer, Reach, AutoClicker, FastPlace, and Velocity checks generate staff alerts. Only sustained, qualifying Speed alerts and remote block interactions are eligible for staged sanctions on new installations. Fly and the other heuristic checks do not automatically escalate. A Speed failed sample or a current buffer above threshold is **not** a sanction event; the debug command shows alert count, heuristic score, and the gate that stopped escalation.
 
 ## Sanctions and appeals
 
-New installations have `enforcement.enabled: true` with `FREECAM_INTERACT` and `SPEED` eligible. Speed requires eight qualifying alerts in 90 seconds at at least 92% heuristic confidence, on stable ground; this is still not proof of cheating. Remote interactions require four qualifying alerts at 98% confidence. There is a 10-minute cooldown after a sanction. **Existing `config.yml` files retain their old eligible-check list**: run `/aegis status`, `/aegis enforcement on` if necessary, then `/aegis enforcement speed on` to add Speed. Test on a private server before enabling Speed sanctions for public players.
+New installations have `enforcement.enabled: true` with `FREECAM_INTERACT` and `SPEED` eligible. Speed requires eight qualifying alerts within 90 seconds, spanning at least five seconds, at a heuristic score of at least 92%. The score is a threshold, not a measured probability of cheating. The old eight-consecutive-ground-tick sanction gate rejected real alert sequences and has been removed; legitimate players can still trigger this heuristic. Remote interactions require four qualifying alerts at 98% confidence. There is a 10-minute cooldown after a sanction. **Existing `config.yml` files retain their old eligible-check list**: run `/aegis status`, `/aegis enforcement on` if necessary, then `/aegis enforcement speed on` to add Speed. Test on a private server before enabling Speed sanctions for public players.
 
 | Event | Action |
 | --- | --- |
@@ -45,7 +45,7 @@ Optional, requires a [proxycheck.io API key](https://proxycheck.io/api/) in envi
 
 Permissions: `aegis.admin`, `aegis.ip`, `aegis.alerts` (default op), `aegis.bypass` (default false). The server-seen IP is not necessarily a player's home IP, especially when behind a proxy. Do not share IPs publicly.
 
-If a check appears idle, inspect `/aegis debug <player>` while that player is moving and interacting. It separates total movement events from **evaluated** and **exempt** positional movements. The previous alpha incorrectly labeled airborne events as exempt; that counter is corrected here. Alert count, last confidence, and the sanction gate explain why a failed sample did not cause a kick. Check `/aegis info` for the loaded plugin version and `/aegis status` for sanction settings. A completed CI build does not replace testing on a running Paper server.
+If a check appears idle, inspect `/aegis debug <player>` while that player is moving and interacting. It separates total movement events from **evaluated** and **exempt** positional movements. Alert count, last heuristic score, the sanction gate, current stage, and cooldown explain why a failed sample did not cause a kick. After eight qualifying Speed alerts spanning at least five seconds, the first sanction is a kick; stages persist between reconnects. Check `/aegis info` for the loaded plugin version and `/aegis status` for sanction settings. The CI build tests the sustained-alert threshold; it does not replace testing on a running Paper server.
 
 Every 30 minutes the plugin broadcasts exactly `Made by @_adam814` by default.
 

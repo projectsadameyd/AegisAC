@@ -84,7 +84,7 @@ public final class AegisCommand implements CommandExecutor {
             plugin.getConfig().set("enforcement.eligible-checks", checks);
             plugin.saveConfig();
             sender.sendMessage("§7Speed sanctions " + (args[2].equalsIgnoreCase("on") ? "enabled" : "disabled")
-                    + "§7. Requires sustained high-confidence alerts on stable ground.");
+                    + "§7. Requires eight qualifying alerts over at least five seconds.");
             AegisAudit.warning(plugin, "SPEED_ENFORCEMENT", "actor=" + sender.getName() + " enabled=" + args[2]);
             return true;
         }
@@ -138,11 +138,13 @@ public final class AegisCommand implements CommandExecutor {
                 long count = data.failedSamples.getOrDefault(type, 0L);
                 if (count > 0) sender.sendMessage("§7" + type.display() + " samples=§f" + count
                         + "§7; alerts=§f" + data.alertCounts.getOrDefault(type, 0L)
-                        + "§7; last confidence=§f" + Math.round(data.lastAlertConfidence.getOrDefault(type, 0.0) * 100) + "%"
+                        + "§7; last score=§f" + Math.round(data.lastAlertConfidence.getOrDefault(type, 0.0) * 100) + "%"
                         + "§7; gate=§f" + data.sanctionGate.getOrDefault(type, "no alert yet"));
             }
             sender.sendMessage("§7Sanctions=§f" + plugin.getConfig().getBoolean("enforcement.enabled", true)
-                    + "§7; eligible=§f" + plugin.getConfig().getStringList("enforcement.eligible-checks"));
+                    + "§7; eligible=§f" + plugin.getConfig().getStringList("enforcement.eligible-checks")
+                    + "§7; stage=§f" + plugin.moderation().stage(target.getUniqueId())
+                    + "§7; cooldown=§f" + (plugin.moderation().cooldownRemaining(target.getUniqueId()) / 1000) + "s");
             return true;
         }
         if (args[0].equalsIgnoreCase("inspect") && args.length == 2) {
