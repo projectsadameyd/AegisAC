@@ -25,7 +25,10 @@ public final class AegisAC extends JavaPlugin {
 
         scheduleCreditBroadcast();
         AegisAudit.info(this, "STARTUP", "Paper 1.21.11; automatic sanctions="
-                + getConfig().getBoolean("enforcement.enabled", false) + "; VPN gate=" + vpnGate.enabled());
+                + getConfig().getBoolean("enforcement.enabled", true) + "; VPN gate=" + vpnGate.enabled()
+                + "; eligible checks=" + getConfig().getStringList("enforcement.eligible-checks"));
+        if (!getConfig().getBoolean("enforcement.enabled", true))
+            getLogger().warning("Automatic kicks and bans are disabled in this server's config.yml. Use /aegis enforcement on after reviewing alerts.");
     }
 
     @Override

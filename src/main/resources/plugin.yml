@@ -1,5 +1,5 @@
 name: AegisAC
-version: 0.2.1-alpha
+version: 0.3.0-alpha
 main: dev.aegisac.core.AegisAC
 api-version: '1.21.11'
 author: _adam814
@@ -7,7 +7,7 @@ description: Conservative alert-first anti-cheat for Paper 1.21.11.
 commands:
   aegis:
     description: AegisAC administration command
-    usage: /aegis <alerts|status|inspect|reset|pardon|unban-ip|reload|info>
+    usage: /aegis <alerts|status|debug|enforcement|ipban|inspect|reset|pardon|unban-ip|reload|info>
     permission: aegis.admin
   aegis-ip:
     description: Show the server-seen IP address of an online player

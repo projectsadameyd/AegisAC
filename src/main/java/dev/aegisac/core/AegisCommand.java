@@ -43,7 +43,7 @@ public final class AegisCommand implements CommandExecutor {
         }
         if (args.length == 0 || args[0].equalsIgnoreCase("info")) {
             sender.sendMessage("§bAegisAC §7v" + plugin.getDescription().getVersion() + " §8- §falert-first Paper 1.21.11 anti-cheat");
-            sender.sendMessage("§7Made by §f@_adam814§7. Sanctions require opt-in configuration.");
+            sender.sendMessage("§7Made by §f@_adam814§7. Use /aegis status and /aegis debug <player> to inspect detection.");
             return true;
         }
         if (args[0].equalsIgnoreCase("alerts")) {
@@ -66,9 +66,65 @@ public final class AegisCommand implements CommandExecutor {
         if (args[0].equalsIgnoreCase("status")) {
             sender.sendMessage("§bAegisAC §7tracking §f" + plugin.data().size() + " §7player record(s). TPS: §f"
                     + String.format(java.util.Locale.ROOT, "%.2f", plugin.currentTps()));
-            sender.sendMessage("§7Sanctions: §f" + plugin.getConfig().getBoolean("enforcement.enabled", false)
+            sender.sendMessage("§7Sanctions: §f" + plugin.getConfig().getBoolean("enforcement.enabled", true)
                     + "§7; permanent IP bans: §f" + plugin.getConfig().getBoolean("enforcement.permanent-ip-ban-enabled", false)
                     + "§7; VPN gate ready: §f" + plugin.vpnGate().enabled());
+            sender.sendMessage("§7Auto-sanction checks: §f" + plugin.getConfig().getStringList("enforcement.eligible-checks")
+                    + "§7. Other checks produce staff alerts only.");
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("enforcement") && args.length == 2) {
+            if (!args[1].equalsIgnoreCase("on") && !args[1].equalsIgnoreCase("off")) {
+                sender.sendMessage("§7Usage: §f/aegis enforcement <on|off>");
+                return true;
+            }
+            boolean enabled = args[1].equalsIgnoreCase("on");
+            plugin.getConfig().set("enforcement.enabled", enabled);
+            plugin.saveConfig();
+            sender.sendMessage("§aAutomatic sanctions " + (enabled ? "enabled" : "disabled")
+                    + ". Eligible checks: " + plugin.getConfig().getStringList("enforcement.eligible-checks"));
+            AegisAudit.warning(plugin, "ENFORCEMENT", "actor=" + sender.getName() + " enabled=" + enabled);
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("ipban") && args.length == 2) {
+            if (!args[1].equalsIgnoreCase("on") && !args[1].equalsIgnoreCase("off")) {
+                sender.sendMessage("§7Usage: §f/aegis ipban <on|off>");
+                return true;
+            }
+            boolean enabled = args[1].equalsIgnoreCase("on");
+            plugin.getConfig().set("enforcement.permanent-ip-ban-enabled", enabled);
+            plugin.saveConfig();
+            sender.sendMessage("§7Permanent IP bans " + (enabled ? "enabled" : "disabled")
+                    + ". Shared addresses can affect unrelated players.");
+            AegisAudit.warning(plugin, "IPBAN_SETTING", "actor=" + sender.getName() + " enabled=" + enabled);
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("debug") && args.length == 2) {
+            Player target = Bukkit.getPlayerExact(args[1]);
+            if (target == null) {
+                sender.sendMessage("§cPlayer must be online.");
+                return true;
+            }
+            PlayerData data = plugin.data().get(target.getUniqueId());
+            String reason = WorldUtil.movementExemptionReason(target, data,
+                    plugin.getConfig().getDouble("minimum-tps", 18.0), plugin.currentTps(),
+                    plugin.getConfig().getInt("maximum-ping-ms", 300));
+            sender.sendMessage("§bAegis debug: §f" + target.getName() + " §7bypass=§f"
+                    + target.hasPermission("aegis.bypass") + "§7, mode=§f" + target.getGameMode()
+                    + "§7, ping=§f" + target.getPing());
+            sender.sendMessage("§7Movement: §f" + data.moveEvents + " §7events, §f"
+                    + data.movementExemptEvents + " §7exempt; current reason: §f"
+                    + (reason == null ? "none" : reason));
+            sender.sendMessage("§7Block interactions: §f" + data.interactionEvents + "§7; canceled as remote: §f"
+                    + data.remoteBlocks + "§7; combat events: §f" + data.combatEvents);
+            sender.sendMessage("§7Checks with failed samples (not proof of cheating):");
+            for (CheckType type : CheckType.values()) {
+                long count = data.failedSamples.getOrDefault(type, 0L);
+                if (count > 0) sender.sendMessage("§7" + type.display() + " §f" + count
+                        + "§7; buffer=§f" + String.format(java.util.Locale.ROOT, "%.2f", data.buffer(type)));
+            }
+            sender.sendMessage("§7Sanctions=§f" + plugin.getConfig().getBoolean("enforcement.enabled", true)
+                    + "§7; eligible=§f" + plugin.getConfig().getStringList("enforcement.eligible-checks"));
             return true;
         }
         if (args[0].equalsIgnoreCase("inspect") && args.length == 2) {
@@ -118,7 +174,7 @@ public final class AegisCommand implements CommandExecutor {
             if (removed) AegisAudit.warning(plugin, "IP_UNBAN", "actor=" + sender.getName() + " ip=" + args[1]);
             return true;
         }
-        sender.sendMessage("§7Usage: §f/aegis <alerts|status|inspect|reset|pardon|unban-ip|reload|info>");
+        sender.sendMessage("§7Usage: §f/aegis <alerts|status|debug|enforcement|ipban|inspect|reset|pardon|unban-ip|reload|info>");
         return true;
     }
 }

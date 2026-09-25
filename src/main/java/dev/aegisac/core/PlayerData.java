@@ -15,6 +15,11 @@ public final class PlayerData {
     long lastVelocityMillis;
     long lastDamageMillis;
     long lastRemoteAuditMillis;
+    long moveEvents;
+    long interactionEvents;
+    long remoteBlocks;
+    long combatEvents;
+    long movementExemptEvents;
     int airTicks;
     int stableGroundTicks;
     double lastVerticalDelta;
@@ -24,6 +29,7 @@ public final class PlayerData {
     final Deque<Long> placeTimes = new ArrayDeque<>();
     final Map<CheckType, Double> buffers = new EnumMap<>(CheckType.class);
     final Map<CheckType, Long> lastAlertMillis = new EnumMap<>(CheckType.class);
+    final Map<CheckType, Long> failedSamples = new EnumMap<>(CheckType.class);
 
     Vector expectedVelocity;
     Location velocityStart;

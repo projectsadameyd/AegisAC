@@ -41,17 +41,22 @@ public final class WorldUtil {
     }
 
     public static boolean basicMovementExempt(Player player, PlayerData data, double minTps, double currentTps, int maxPing) {
-        if (player.hasPermission("aegis.bypass")) return true;
-        if (player.getGameMode().name().equals("CREATIVE") || player.getGameMode().name().equals("SPECTATOR")) return true;
-        if (player.getAllowFlight() || player.isFlying() || player.isInsideVehicle()) return true;
-        if (player.isGliding() || player.isSwimming() || player.isRiptiding()) return true;
-        if (player.getPing() > maxPing) return true;
-        if (currentTps < minTps) return true;
+        return movementExemptionReason(player, data, minTps, currentTps, maxPing) != null;
+    }
+
+    public static String movementExemptionReason(Player player, PlayerData data, double minTps, double currentTps, int maxPing) {
+        if (player.hasPermission("aegis.bypass")) return "aegis.bypass permission";
+        if (player.getGameMode().name().equals("CREATIVE") || player.getGameMode().name().equals("SPECTATOR")) return "creative/spectator mode";
+        if (player.getAllowFlight() || player.isFlying() || player.isInsideVehicle()) return "flight permission/vehicle";
+        if (player.isGliding() || player.isSwimming() || player.isRiptiding()) return "gliding/swimming/riptide";
+        if (player.getPing() > maxPing) return "ping over " + maxPing + "ms";
+        if (currentTps < minTps) return "TPS under " + minTps;
         long now = System.currentTimeMillis();
-        if (now - data.lastTeleportMillis < 1400L) return true;
-        if (now - data.lastVelocityMillis < 900L) return true;
-        if (now - data.lastDamageMillis < 500L) return true;
-        return nearSpecialMovementBlock(player.getLocation());
+        if (now - data.lastTeleportMillis < 1400L) return "recent teleport/join";
+        if (now - data.lastVelocityMillis < 900L) return "recent velocity";
+        if (now - data.lastDamageMillis < 500L) return "recent damage";
+        if (nearSpecialMovementBlock(player.getLocation())) return "near special block";
+        return null;
     }
 
     public static double horizontalDistance(Location a, Location b) {
