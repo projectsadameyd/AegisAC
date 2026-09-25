@@ -7,18 +7,24 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class AegisAC extends JavaPlugin {
     private final PlayerDataManager data = new PlayerDataManager();
     private ViolationEngine violations;
+    private Moderation moderation;
+    private VpnGate vpnGate;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        moderation = new Moderation(this);
+        vpnGate = new VpnGate(this);
         violations = new ViolationEngine(this);
         getServer().getPluginManager().registerEvents(new AegisListener(this), this);
 
         PluginCommand command = getCommand("aegis");
         if (command != null) command.setExecutor(new AegisCommand(this));
+        PluginCommand ipCommand = getCommand("aegis-ip");
+        if (ipCommand != null) ipCommand.setExecutor(new AegisCommand(this));
 
         scheduleCreditBroadcast();
-        getLogger().info("AegisAC enabled for Paper 1.21.11. Alert-only mode; automatic bans/kicks are not implemented.");
+        getLogger().info("AegisAC enabled for Paper 1.21.11. Automatic sanctions: " + getConfig().getBoolean("enforcement.enabled", false));
     }
 
     @Override
@@ -40,6 +46,10 @@ public final class AegisAC extends JavaPlugin {
     public ViolationEngine violations() {
         return violations;
     }
+
+    public Moderation moderation() { return moderation; }
+
+    public VpnGate vpnGate() { return vpnGate; }
 
     public double currentTps() {
         try {

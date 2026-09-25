@@ -1,5 +1,4 @@
-# AegisAC 0.1.0-alpha
-# Alert-first by design: this build never bans or kicks players.
+# AegisAC 0.2.0-alpha. Keep sanctions disabled until checked on your own test server.
 
 broadcast-credit: true
 broadcast-credit-seconds: 1800
@@ -11,7 +10,29 @@ alerts:
   minimum-confidence: 0.72
   cooldown-ms: 1250
 
+# Repeated eligible alerts advance a persisted sanction stage.
+# Stages 1-3: kicks; 4: one-hour temp block; 5: one-day temp block;
+# 6: permanent account + IP block only when the extra IP-ban switch is true.
+enforcement:
+  enabled: false
+  permanent-ip-ban-enabled: false
+  eligible-checks: [FREECAM_INTERACT]
+  minimum-confidence: 0.98
+  alerts-required: 4
+  evidence-window-ms: 90000
+  cooldown-ms: 600000
+
+# Put the key in the server process environment, never in this file.
+# A third-party service receives the connecting IP. Errors allow login.
+vpn:
+  enabled: false
+  api-key-env: AEGIS_PROXYCHECK_KEY
+
 checks:
+  remote-interact:
+    enabled: true
+    max-eye-distance: 8.5
+    buffer-to-alert: 2.0
   speed:
     enabled: true
     max-ground-horizontal-per-tick: 0.62
