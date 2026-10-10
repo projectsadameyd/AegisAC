@@ -1,0 +1,7 @@
+build/
+__pycache__/
+AegisAC-R15-TimerSafety.jar
+original/lib/grim-corresponding-source.tar.gz
+original/lib/linkage-api-dependencies.jar
+source/lib/paper-api-dependencies.jar
+source/lib/paper-api.jar

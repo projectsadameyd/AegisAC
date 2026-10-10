@@ -1,0 +1,36 @@
+# AegisAC connection protection. No cheating ban or escalation is added by this gate.
+# Public connecting IPs are checked over HTTPS with proxycheck.io v3.
+# 100 IP queries/day without a key; a free registered key provides 1,000/day.
+enabled: true
+api-key: ""
+block-vpn: true
+block-proxy: true
+block-tor: true
+# true allows joins during an outage, timeout or exhausted quota.
+# false refuses unverified connections using messages.unavailable below.
+allow-on-lookup-failure: true
+timeout-ms: 2000
+cache-seconds: 600
+error-cache-seconds: 10
+max-cache-entries: 2048
+# Exact IPv4/IPv6 addresses. Local/private addresses are also skipped.
+allowed-ips: []
+log-blocks: true
+webhook-blocks: true
+messages:
+  blocked: |-
+    &6&lAegisAC
+    &cVPN / Proxy Connection Blocked
+
+    &7Detected connection: &f{reason}
+    &7Disable your VPN or proxy, then reconnect.
+
+    &8Need help? &7discord.gg/ShtDEU2x3z
+  unavailable: |-
+    &6&lAegisAC
+    &eConnection Verification Unavailable
+
+    &7We could not verify your connection right now.
+    &7Please try again shortly.
+
+    &8Need help? &7discord.gg/ShtDEU2x3z

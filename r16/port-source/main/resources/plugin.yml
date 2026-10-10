@@ -1,0 +1,31 @@
+name: AegisAC
+version: 4.2.0-r16-vpnguard1-mc1.21.11
+main: dev.aegisac.AegisPlugin
+api-version: '1.21.11'
+author: '@_adam814'
+description: AegisAC anti-cheat, connection protection and server administration.
+website: https://discord.gg/ShtDEU2x3z
+softdepend: [ViaVersion, ViaBackwards, ViaRewind, floodgate, Geyser-Spigot, ProtocolLib, ProtocolSupport, Essentials, FastLogin, PlaceholderAPI, LuckPerms, sqlite-jdbc, mysql-jdbc, postgresql-jdbc, mongodb-driver, jedis]
+commands:
+  aegis:
+    description: AegisAC administration
+    permission: aegisac.admin
+permissions:
+  aegisac.admin:
+    default: op
+  aegisac.alerts:
+    default: op
+  aegisgrim.admin:
+    default: op
+    children:
+      aegisac.admin: true
+  grim.exempt:
+    default: false
+  grim.nomodifypacket:
+    default: false
+  donutac.bypass:
+    default: false
+  grim.alerts:
+    default: op
+  donutac.alerts:
+    default: false

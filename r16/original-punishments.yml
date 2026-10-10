@@ -1,0 +1,111 @@
+# R14 native action profile. Detection, prediction tolerances and setbacks remain original Grim.
+# [aegis] is consumed by the output adapter. Each native group acts independently.
+# Prevention happens inside original check methods without waiting for these ban thresholds.
+Punishments:
+  Simulation:
+    remove-violations-after: 60
+    checks:
+      - "Simulation"
+    # Keep prediction/corrections, but never automatically sanction Simulation.
+    commands: []
+  Ground:
+    remove-violations-after: 60
+    checks:
+      - "GroundSpoof"
+      - "NoFall"
+    commands:
+      - "10:0 [aegis]"
+      - "10:10 [log]"
+  Timer:
+    remove-violations-after: 60
+    checks:
+      - "Timer"
+    commands:
+      - "20:0 [aegis]"
+      - "20:20 [log]"
+  Knockback:
+    remove-violations-after: 60
+    checks:
+      - "Knockback"
+      - "Explosion"
+    commands:
+      - "5:0 [aegis]"
+      - "5:5 [log]"
+  HardPackets:
+    remove-violations-after: 60
+    checks:
+      - "CrashC"
+      - "BadPacketsY"
+      - "BadPacketsI"
+      - "BadPacketsK"
+      - "BadPacketsD"
+    commands:
+      - "1:0 [aegis]"
+      - "1:1 [log]"
+  BadPackets:
+    remove-violations-after: 60
+    checks:
+      - "BadPackets"
+      - "PacketOrder"
+      - "Crash"
+      - "!CrashC"
+      - "!BadPacketsY"
+      - "!BadPacketsI"
+      - "!BadPacketsK"
+      - "!BadPacketsD"
+    commands:
+      - "20:0 [aegis]"
+      - "20:20 [log]"
+  Reach:
+    remove-violations-after: 60
+    checks:
+      - "Reach"
+    commands:
+      - "3:0 [aegis]"
+      - "3:3 [log]"
+  Hitboxes:
+    remove-violations-after: 60
+    checks:
+      - "Hitboxes"
+    commands:
+      - "5:0 [aegis]"
+      - "5:5 [log]"
+  Misc:
+    remove-violations-after: 60
+    checks:
+      - "Vehicle"
+      - "NoSlow"
+      - "Sprint"
+      - "MultiActions"
+      - "Place"
+      - "Baritone"
+      - "Break"
+      - "TransactionOrder"
+      - "Elytra"
+      - "Chat"
+      - "Exploit"
+    commands:
+      - "20:0 [aegis]"
+      - "20:20 [log]"
+  Post:
+    remove-violations-after: 60
+    checks:
+      - "Post"
+    commands:
+      - "20:0 [aegis]"
+      - "20:20 [log]"
+  Combat:
+    remove-violations-after: 60
+    checks:
+      - "Interact"
+      - "Aim"
+    commands:
+      - "20:0 [aegis]"
+      - "20:20 [log]"
+  Autoclicker:
+    remove-violations-after: 60
+    checks:
+      - "Autoclicker"
+    commands:
+      - "20:0 [aegis]"
+      - "20:20 [log]"

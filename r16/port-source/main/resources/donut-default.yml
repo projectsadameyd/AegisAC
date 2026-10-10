@@ -1,0 +1,141 @@
+# AegisAC assistant configuration
+
+settings:
+  # Name shown in ban screens, GUIs and messages via %server%
+  server-name: "AegisAC"
+  # Prefix used on all plugin chat messages (gold/black big-server theme)
+  prefix: "&8[&6AegisAC&8] &r"
+  # Broadcast violation alerts to staff with donutac.alerts permission
+  alerts-enabled: false
+  # Seconds of no new violations before a check's VL starts decaying
+  decay-idle-seconds: 60
+  # Amount of VL removed per decay tick
+  decay-amount: 1
+  # Decay tick interval in seconds
+  decay-interval-seconds: 10
+  # Ban ID prefix shown to punished players
+  ban-id-prefix: "kdr"
+  # Discord/appeal link shown on the ban screen
+  appeal-link: "https://discord.gg/ShtDEU2x3z"
+
+# Discord webhook integration - posts staff events straight into a Discord channel.
+# Create a webhook in your channel settings and paste its URL below, then set enabled: true.
+discord:
+  enabled: false
+  webhook-url: ""
+  username: "AegisAC"
+  avatar-url: ""
+  # Toggle which event types get posted
+  events:
+    bans: true
+    kicks: true
+    mutes-warns: true
+    alerts: true
+    offenses: true
+
+# Preset reasons available to staff via /offend <player> <reason>.
+# Staff can still type a custom reason if none of these fit.
+offend-reasons:
+  - "Chat Abuse"
+  - "Team Griefing"
+  - "Suspected Cheating"
+  - "Exploiting"
+  - "Scamming"
+  - "Disrespect / Toxicity"
+  - "Advertising"
+
+# Violation level labels shown in alerts, GUIs and punishment messages.
+# Gold -> red escalation, matching big-server severity theming.
+violation-levels:
+  1: { label: "Suspicious", color: "&e" }
+  2: { label: "Suspicious", color: "&6" }
+  3: { label: "Alert", color: "&6&l" }
+  4: { label: "High", color: "&c&l" }
+  5: { label: "Critical", color: "&4&l" }
+
+# Each check can be individually toggled, tuned and given its own punishment ladder.
+# Punishment "action" may be: WARN, KICK, MUTE, BAN
+# "duration" only applies to MUTE/BAN. Use "permanent" or values like 10m, 1h, 7d, 30d.
+checks:
+  combat:
+    killaura:
+      enabled: true
+      display-name: "KillAura (Type A)"
+      max-attack-angle: 70.0
+      max-targets-per-second: 4
+      punishments:
+        3: { action: WARN }
+        5: { action: KICK }
+        8: { action: BAN, duration: "7d", reason: "Unfair Advantage" }
+    reach:
+      enabled: true
+      display-name: "Reach"
+      max-reach-distance: 3.3
+      punishments:
+        3: { action: WARN }
+        6: { action: KICK }
+        10: { action: BAN, duration: "7d", reason: "Combat Range Exploit" }
+
+  movement:
+    speed:
+      enabled: true
+      display-name: "Speed"
+      max-horizontal-speed: 0.42
+      punishments:
+        3: { action: WARN }
+        6: { action: KICK }
+        10: { action: BAN, duration: "3d", reason: "Movement Exploit" }
+    flight:
+      enabled: true
+      display-name: "Flight"
+      max-air-time-ticks: 40
+      punishments:
+        3: { action: WARN }
+        6: { action: KICK }
+        10: { action: BAN, duration: "3d", reason: "Fly Hack" }
+
+  inventory:
+    fast-use:
+      enabled: true
+      display-name: "FastInventory"
+      min-click-delay-ms: 90
+      punishments:
+        4: { action: WARN }
+        8: { action: KICK }
+        12: { action: BAN, duration: "1d", reason: "Inventory Exploit" }
+
+  world:
+    nuker:
+      enabled: true
+      display-name: "Nuker"
+      min-break-delay-ms: 60
+      max-blocks-per-second: 12
+      punishments:
+        3: { action: WARN }
+        6: { action: KICK }
+        10: { action: BAN, duration: "3d", reason: "World Exploit" }
+    fast-place:
+      enabled: true
+      display-name: "FastPlace"
+      min-place-delay-ms: 40
+      punishments:
+        4: { action: WARN }
+        8: { action: KICK }
+        12: { action: BAN, duration: "1d", reason: "World Exploit" }
+
+messages:
+  ban-screen:
+    title: "&6&l%server%"
+    subtitle: "&8&m                                   "
+    line1: "&7You have been &c&lbanned&7 from &6%server%&7."
+    permanent-line1: "&7You have been &c&lpermanently banned&7 from &6%server%&7."
+    time-left: "&7Time Remaining: &e%time%"
+    ban-id: "&7Ban ID: &f#%banid%"
+    appeal: "&7Appeal at: &b%appeal%"
+  warn: "%prefix%&6&lWARNING &7\u00bb &fSuspicious activity detected &7(&e%check%&7). Continued violations will result in punishment on &6%server%&7."
+  mute: "%prefix%&c&lMUTED &7\u00bb &fYou have been muted for &e%duration%&7. Reason: &f%reason%"
+  kick: "&6&l%server%\n\n&7You were kicked for &e%check%&7.\n&7Violation Level: &6%vl%"
+  alert: "%prefix%&6%player% &7failed &e%check% &7(x&6%vl%&7) &8[ping: %ping%ms]"
+  unbanned: "%prefix%&a%player% &7has been unbanned from &6%server%&7."
+  not-banned: "%prefix%&c%player% is not banned."
+  reload: "%prefix%&aConfiguration reloaded."

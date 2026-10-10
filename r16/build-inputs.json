@@ -1,0 +1,12 @@
+{
+  "source_asset_url": "https://github.com/projectsadameyd/AegisAC/releases/download/v4.2.0-r16-vpnguard1/AegisAC-R16-VPNGuard-Source.zip",
+  "source_asset_sha256": "65a974c43ba4159d6acb389f65177b6c8489fe17639d096199e98f16f8641691",
+  "source_root": "AegisAC-Multi-Version-Source",
+  "inputs": {
+    "AegisAC-R15-TimerSafety.jar": "e9c83d7dcb88c291abcfca2bee477cc20a98dcd011f42c9e4c1bc26232495f3f",
+    "source/lib/paper-api.jar": "c577b181c11a8674310e56c92a91e31c010b7f04c9bd10b91c3be18374401070",
+    "source/lib/paper-api-dependencies.jar": "4e9088779c2b5829367536f68d950c10715f6c75f277b242cc1bfcda43aa6648",
+    "original/lib/linkage-api-dependencies.jar": "64457a6979ee7d7f0e8772b3c1b550c0e69617886722e1f4f72db707d04b10ed",
+    "original/lib/grim-corresponding-source.tar.gz": "ccb3fb2f9f82be31eb8790921b2f37b720c3d66f68230794824b7b19a880b772"
+  }
+}
