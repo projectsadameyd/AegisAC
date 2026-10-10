@@ -1,3 +1,4 @@
+<img width="1254" height="1254" alt="AegisAC logo original" src="https://github.com/user-attachments/assets/3ac52706-ffed-48c9-b23f-fabe92974a2d" />
 # AegisAC 0.3.5-alpha
 
 Paper 1.21.11 / Java 21 anti-cheat prototype. Put the built JAR in `plugins/` and restart Paper. Test on a private server before deploying to players.
