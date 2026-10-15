@@ -1,0 +1,231 @@
+{
+  "mode": "remote",
+  "protocol": "1.21.11",
+  "started": "2026-10-15T15:01:30.757Z",
+  "steps": [
+    "spawn and eight-second stabilization",
+    "remote block request 1",
+    "remote block request 2",
+    "remote block request 3"
+  ],
+  "kicked": {
+    "type": "compound",
+    "value": {
+      "extra": {
+        "type": "list",
+        "value": {
+          "type": "compound",
+          "value": [
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "underlined": {
+                "type": "byte",
+                "value": 0
+              },
+              "bold": {
+                "type": "byte",
+                "value": 1
+              },
+              "color": {
+                "type": "string",
+                "value": "gold"
+              },
+              "obfuscated": {
+                "type": "byte",
+                "value": 0
+              },
+              "strikethrough": {
+                "type": "byte",
+                "value": 0
+              },
+              "text": {
+                "type": "string",
+                "value": "AegisAC\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "bold": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "dark_gray"
+              },
+              "strikethrough": {
+                "type": "byte",
+                "value": 1
+              },
+              "text": {
+                "type": "string",
+                "value": "--------------------------------\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "bold": {
+                "type": "byte",
+                "value": 1
+              },
+              "color": {
+                "type": "string",
+                "value": "yellow"
+              },
+              "strikethrough": {
+                "type": "byte",
+                "value": 0
+              },
+              "text": {
+                "type": "string",
+                "value": "Remote Interaction Blocked\n\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "bold": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "Repeated interactions exceeded your character's\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "server-side reach. Remote camera interactions\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "are not permitted on this server.\n\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "Disable any freecam or remote interaction feature,\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "then reconnect. Contact staff if this repeats.\n\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "dark_gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "Reference: "
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "white"
+              },
+              "text": {
+                "type": "string",
+                "value": "R17-MV9O2TYD\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "dark_gray"
+              },
+              "strikethrough": {
+                "type": "byte",
+                "value": 1
+              },
+              "text": {
+                "type": "string",
+                "value": "--------------------------------"
+              }
+            }
+          ]
+        }
+      },
+      "text": {
+        "type": "string",
+        "value": ""
+      }
+    }
+  },
+  "errors": [],
+  "clientWorldSamples": [],
+  "spawn": {
+    "x": 1.5,
+    "y": -60,
+    "z": -7.5
+  },
+  "guardKickVerified": true,
+  "finished": "2026-10-15T15:01:41.038Z"
+}

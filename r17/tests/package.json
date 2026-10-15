@@ -1,0 +1,6 @@
+{
+  "name": "aegisac-r17-local-qa",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": { "mineflayer": "4.39.0" }
+}
