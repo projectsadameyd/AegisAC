@@ -14,10 +14,12 @@ public final class AegisPlugin extends GrimACBukkitLoaderPlugin {
     private DonutAntiCheat donut;
     private VpnGate vpn;
     private NativeGuard guard;
+    private CompanionGate companion;
     public static AegisPlugin instance(){return instance;}
     public DonutAntiCheat donut(){return donut;}
     VpnGate vpn(){return vpn;}
     NativeGuard guard(){return guard;}
+    CompanionGate companion(){return companion;}
     @Override public void onLoad() {
         instance=this;NativeConfig.install(this);
         try{PresentationConfig.migrate(getDataFolder().toPath());}
@@ -34,10 +36,12 @@ public final class AegisPlugin extends GrimACBukkitLoaderPlugin {
         if(!new File(getDataFolder(),"aegis-logo.png").exists())saveResource("aegis-logo.png",false);
         AegisGrimAddon.configureBranding();
         try{guard=new NativeGuard(this);}catch(IOException error){getLogger().severe("R17 interaction protection did not enable: "+error.getMessage());}
-        getLogger().info("R17-NATIVE-GUARD1: AegisAC detection, packet prevention and remote interaction protection. Use /aegis guard status.");
+        companion=new CompanionGate(this);
+        getLogger().info("R17-COMPANION2: AegisAC detection, remote interaction protection and required companion admission. Use /aegis client status.");
         getServer().getScheduler().runTaskTimer(this,()->getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&',"&eMade by @_adam814")),12000,12000);
     }
     @Override public void onDisable() {
+        if(companion!=null){companion.close();companion=null;}
         if(guard!=null){guard.close();guard=null;}
         if(vpn!=null){HandlerList.unregisterAll(vpn);vpn.close();vpn=null;}
         if(donut!=null){HandlerList.unregisterAll(donut);getServer().getScheduler().cancelTasks(donut);donut.onDisable();}

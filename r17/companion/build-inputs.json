@@ -1,0 +1,60 @@
+{
+  "minecraft": "1.21.11",
+  "inputs": [
+    {
+      "path": "companion-tooling/mapping-io-0.8.0.jar",
+      "url": "https://maven.fabricmc.net/net/fabricmc/mapping-io/0.8.0/mapping-io-0.8.0.jar",
+      "sha256": "cf137c7f9049a8d4c0ada8e765180462bf1cda42172300821229ac2d46b6548c"
+    },
+    {
+      "path": "companion-tooling/tiny-remapper-0.12.2.jar",
+      "url": "https://maven.fabricmc.net/net/fabricmc/tiny-remapper/0.12.2/tiny-remapper-0.12.2.jar",
+      "sha256": "4711c85628635e1410ac2ce816a952e02f83f81c2321a4a4beb6ad339410ccf5"
+    },
+    {
+      "path": "companion-tooling/asm-9.9.jar",
+      "url": "https://repo.maven.apache.org/maven2/org/ow2/asm/asm/9.9/asm-9.9.jar",
+      "sha256": "03d99a74ad1ee5c71334ef67437f4ef4fe3488caa7c96d8645abc73c8e2017d4"
+    },
+    {
+      "path": "companion-tooling/asm-tree-9.9.jar",
+      "url": "https://repo.maven.apache.org/maven2/org/ow2/asm/asm-tree/9.9/asm-tree-9.9.jar",
+      "sha256": "42178f3775c9c63f9e5e1446747d29b4eca4d91bd6e75e5c43cfa372a47d38c6"
+    },
+    {
+      "path": "companion-tooling/asm-commons-9.9.jar",
+      "url": "https://repo.maven.apache.org/maven2/org/ow2/asm/asm-commons/9.9/asm-commons-9.9.jar",
+      "sha256": "db2f6f26150bbe7c126606b4a1151836bcc22a1e05a423b3585698bece995ff8"
+    },
+    {
+      "path": "minecraft-client-metadata-1.21.11.json",
+      "url": "https://piston-meta.mojang.com/v1/packages/718cd84b4912691fe5de829aab6876a4b7f6c5c4/1.21.11.json",
+      "sha256": "471a6eeadf1c74f84ed5d4290fb7234b746373478a4d6ac651962b93f0cb36d9"
+    },
+    {
+      "path": "minecraft-client-1.21.11.jar",
+      "url": "https://piston-data.mojang.com/v1/objects/ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd/client.jar",
+      "sha256": "1473c9489ac50fda3c435049a76a70d61a10b8610db27f5ba9d8756b686cd3bd"
+    },
+    {
+      "path": "mojang-client-1.21.11.txt",
+      "url": "https://piston-data.mojang.com/v1/objects/031a68bebf55d824f66d6573d8c752f0e1bf232a/client.txt",
+      "sha256": "517799a8485e107e932dc1bd27c002b2d0b9207eb2396b685bcfe6c3321a9fbd"
+    },
+    {
+      "path": "fabric-loader-0.19.5.jar",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loader/0.19.5/fabric-loader-0.19.5.jar",
+      "sha256": "93044e4dd46de5d8136701292f05e868da096d2c9fddb4793e4fdbcc63efc695"
+    },
+    {
+      "path": "fabric-intermediary-1.21.11.jar",
+      "url": "https://maven.fabricmc.net/net/fabricmc/intermediary/1.21.11/intermediary-1.21.11-v2.jar",
+      "sha256": "f45b9530d0becae596fd48743e3ee1733cc2cdc69128cdb7d8d3571de163ab87"
+    },
+    {
+      "path": "fabric-api-0.141.6.jar",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/0.141.6+1.21.11/fabric-api-0.141.6+1.21.11.jar",
+      "sha256": "bdff7fd7e220085cfad2ff9b1f40dde6534ae0b96cf378f97a374bc54cb9ed0f"
+    }
+  ]
+}

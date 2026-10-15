@@ -5,3 +5,6 @@
 /tools/library-helpers/
 /tests/node_modules/
 *.class
+/companion/.gradle/
+/companion/build/
+/companion/run/

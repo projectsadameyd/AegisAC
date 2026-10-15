@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "aegisac_companion",
+  "version": "${version}",
+  "name": "AegisAC Companion",
+  "description": "Reports known cheat-client code signatures from loaded mods when an AegisAC server requests admission screening. No unrelated files or full mod lists are sent. Reports are not tamper-proof attestation.",
+  "authors": ["@_adam814"],
+  "contact": {"sources": "https://github.com/projectsadameyd/AegisAC/tree/development/r17-native-guard/r17/companion"},
+  "license": "GPL-3.0-only",
+  "environment": "client",
+  "entrypoints": {"client": ["dev.aegisac.companion.AegisCompanionClient"]},
+  "depends": {"fabricloader": ">=0.19.5", "minecraft": "=1.21.11", "java": ">=21", "fabric-api": ">=0.141.0"}
+}

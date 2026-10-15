@@ -22,6 +22,12 @@ public final class BuildR17 {
         for(String name:List.of(BASE_NAME,SOURCE_NAME)) {
             Path p=inputs.resolve(name);if(!Files.exists(p))download(ASSETS+name,p);verify(p,PINS.get(name));
         }
+        String[][] screeningInputs={
+            {"meteor-client-0.5.9.jar","https://maven.meteordev.org/releases/meteordevelopment/meteor-client/0.5.9/meteor-client-0.5.9.jar","55e81715d0f2d485eb36c9aa96a57a83a0236890b97c3ed352e57af12ed68001"},
+            {"meteor-client-1.21.11-86.jar","https://meteorclient.com/api/download?version=1.21.11","93390cfdb1030e47f116357ba421c90a9b1ca4832b6551c2dec1ade5eeb42e71"},
+            {"sodium-1.21.11.jar","https://cdn.modrinth.com/data/AANobbMI/versions/RB7CDjTS/sodium-fabric-0.8.15-beta.1%2Bmc1.21.11.jar","f0bd613154a9ed0712d1d8aa62f1de3fb0fc1e76b4edc37f1250679007029775"}
+        };
+        for(String[] input:screeningInputs){Path p=inputs.resolve(input[0]);if(!Files.exists(p))download(input[1],p);verify(p,input[2]);}
         try(ZipFile source=new ZipFile(inputs.resolve(SOURCE_NAME).toFile())) {
             for(String name:List.of("source/lib/paper-api.jar","source/lib/paper-api-dependencies.jar","original/lib/linkage-api-dependencies.jar")) {
                 Path p=inputs.resolve(Path.of(name).getFileName());
@@ -32,28 +38,29 @@ public final class BuildR17 {
         Path generated=out.resolve("generated/dev/aegisac");Files.createDirectories(generated);
         String addon=read(repo.resolve("r16/port-source/main/java/dev/aegisac/AegisGrimAddon.java"));
         addon=replace(addon,"R16-VPNGUARD1","R17-NATIVE-GUARD1");
+        addon=replace(addon,"R17-NATIVE-GUARD1","R17-COMPANION2");
         addon=replace(addon,"               && !\"TimerLimit\".equalsIgnoreCase(var3.getCheckName())","               && !\"TimerLimit\".equalsIgnoreCase(var3.getCheckName())\n               && !R17SanctionSafety.timingOnly(var3.getCheckName())");
         addon=replace(addon,"   private void nativeAction(UUID var1, String var2, String var3, String var4, String var5, Check var6) {","   private void nativeAction(UUID var1, String var2, String var3, String var4, String var5, Check var6) {\n      if (R17SanctionSafety.timingOnly(var4)) return;");
-        addon=replace(addon,"      if (var4.length > 0 && this.admin.handle(var1, var4)) {","      if (var4.length > 0 && this.plugin.guard() != null && this.plugin.guard().command(var1, var4)) return true;\n\n      if (var4.length > 0 && this.admin.handle(var1, var4)) {");
-        addon=replace(addon,"               this.plugin.reloadConnectionGuard();","               this.plugin.reloadConnectionGuard();\n               if (this.plugin.guard() != null) this.plugin.guard().reload();");
+        addon=replace(addon,"      if (var4.length > 0 && this.admin.handle(var1, var4)) {","      if (var4.length > 0 && this.plugin.companion() != null && this.plugin.companion().command(var1, var4)) return true;\n      if (var4.length > 0 && this.plugin.guard() != null && this.plugin.guard().command(var1, var4)) return true;\n\n      if (var4.length > 0 && this.admin.handle(var1, var4)) {");
+        addon=replace(addon,"               this.plugin.reloadConnectionGuard();","               this.plugin.reloadConnectionGuard();\n               if (this.plugin.guard() != null) this.plugin.guard().reload();\n               if (this.plugin.companion() != null) this.plugin.companion().reload();");
         addon=replace(addon,"   String vpnStatus() {","   static boolean remoteActionSanctionsPaused() {\n      AegisGrimAddon owner = INSTANCE;\n      return owner == null || owner.reviewPaused(System.currentTimeMillis());\n   }\n\n   static void remoteInteractionKicked(Player player, String reason) {\n      AegisGrimAddon owner = INSTANCE;\n      if (owner == null) return;\n      owner.history.append(player.getUniqueId(), player.getName(), \"REMOTE_INTERACTION_KICK\", reason);\n      owner.plugin.getLogger().warning(\"AegisAC blocked repeated remote interactions: \" + player.getName() + \" \" + reason);\n      owner.postWebhook(\"Remote Interaction Blocked\", \"**Player:** \" + player.getName() + \"\\n**Evidence:** \" + reason + \"\\n**Action:** Kicked; no ban stage added.\", 16766720);\n   }\n\n   String vpnStatus() {");
         Files.writeString(generated.resolve("AegisGrimAddon.java"),addon);
         String admin=read(repo.resolve("r16/port-source/main/java/dev/aegisac/AegisAdminCommands.java"));
-        admin=replace(admin,"      \"vpn\"\n   );","      \"vpn\",\n      \"guard\",\n      \"xray\"\n   );");
+        admin=replace(admin,"      \"vpn\"\n   );","      \"vpn\",\n      \"guard\",\n      \"xray\",\n      \"client\"\n   );");
         Files.writeString(generated.resolve("AegisAdminCommands.java"),admin);
-        List<Path> sourceFiles=files(root.resolve("src/main/java"),".java");sourceFiles.add(generated.resolve("AegisGrimAddon.java"));sourceFiles.add(generated.resolve("AegisAdminCommands.java"));
+        List<Path> sourceFiles=files(root.resolve("src/main/java"),".java");sourceFiles.addAll(files(root.resolve("companion/shared"),".java"));sourceFiles.add(generated.resolve("AegisGrimAddon.java"));sourceFiles.add(generated.resolve("AegisAdminCommands.java"));
         Path classes=out.resolve("classes"),tests=out.resolve("tests"),temp=out.resolve("temp");Files.createDirectories(classes);Files.createDirectories(tests);Files.createDirectories(temp);
         String cp=classpath(List.of(inputs.resolve(BASE_NAME),inputs.resolve("paper-api.jar"),inputs.resolve("paper-api-dependencies.jar"),inputs.resolve("linkage-api-dependencies.jar")));
         compile(sourceFiles,classes,cp,17);
         Map<String,byte[]> overlay=new TreeMap<>();
         for(Path p:files(classes,".class"))overlay.put(classes.relativize(p).toString().replace('\\','/'),Files.readAllBytes(p));
         Path resources=root.resolve("src/main/resources");for(Path p:files(resources,null))overlay.put(resources.relativize(p).toString().replace('\\','/'),Files.readAllBytes(p));
-        String plugin=read(repo.resolve("r16/port-source/main/resources/plugin.yml")).replaceFirst("(?m)^version:.*$","version: 4.3.0-r17-nativeguard-preview1-mc1.21.11");
+        String plugin=read(repo.resolve("r16/port-source/main/resources/plugin.yml")).replaceFirst("(?m)^version:.*$","version: 4.3.0-r17-companion-preview2-mc1.21.11");
         plugin+="\n  aegisac.guard.bypass:\n    description: Explicit bypass for the R17 remote action guard\n    default: false\n";
         overlay.put("plugin.yml",plugin.getBytes(StandardCharsets.UTF_8));
-        overlay.put("aegis-compatibility.json",("{\"minecraft_version\":\"1.21.11\",\"runtime_java_minimum\":21,\"aegis_build\":\"R17-NATIVE-GUARD1-preview1\",\"base_release\":\"v4.2.0-r16-vpnguard1\",\"client_filesystem_scan\":false,\"passive_freecam_detection\":false,\"remote_interaction_prevention\":true,\"anti_xray\":\"per-world configuration; restart required\",\"validation\":\"see QA_REPORT.md\"}\n").getBytes(StandardCharsets.UTF_8));
+        overlay.put("aegis-compatibility.json",("{\"minecraft_version\":\"1.21.11\",\"runtime_java_minimum\":21,\"aegis_build\":\"R17-COMPANION2-preview2\",\"base_release\":\"v4.2.0-r16-vpnguard1\",\"server_client_filesystem_access\":false,\"required_companion\":\"Fabric 1.21.11; known loaded-code signatures; reports are forgeable\",\"passive_freecam_detection\":false,\"remote_interaction_prevention\":true,\"anti_xray\":\"per-world configuration; restart required\",\"validation\":\"see QA_REPORT.md and COMPANION_QA.md\"}\n").getBytes(StandardCharsets.UTF_8));
         if(Files.exists(root.resolve("THIRD_PARTY_NOTICES.md")))overlay.put("R17-THIRD_PARTY_NOTICES.md",Files.readAllBytes(root.resolve("THIRD_PARTY_NOTICES.md")));
-        Path jar=out.resolve("AegisAC-R17-NativeGuard-preview1-1.21.11.jar");
+        Path jar=out.resolve("AegisAC-R17-Companion-preview2-1.21.11.jar");
         try(ZipFile base=new ZipFile(inputs.resolve(BASE_NAME).toFile());ZipOutputStream z=new ZipOutputStream(Files.newOutputStream(jar))) {
             TreeSet<String> names=new TreeSet<>(overlay.keySet());base.stream().filter(e->!e.isDirectory()).forEach(e->names.add(e.getName()));
             for(String name:names) {
@@ -80,11 +87,12 @@ public final class BuildR17 {
         compile(testFiles,tests,testCp,21);
         String java=Path.of(System.getProperty("java.home"),"bin",System.getProperty("os.name").startsWith("Windows")?"java.exe":"java").toString();
         StringBuilder results=new StringBuilder("{\n  \"r16_engine_classes_unchanged\": "+unchanged+",\n  \"java\": \""+System.getProperty("java.version")+"\",\n  \"suites\": [\n");
-        List<String> suites=List.of("NativeActionRegressionTest","DispatcherHistoryRegressionTest","TimerSafetyRegressionTest","VpnSourceRecoveryRegressionTest","RemoteInteractionRegressionTest","AntiXrayRegressionTest","R17TimingSafetyRegressionTest");
+        List<String> suites=List.of("NativeActionRegressionTest","DispatcherHistoryRegressionTest","TimerSafetyRegressionTest","VpnSourceRecoveryRegressionTest","RemoteInteractionRegressionTest","AntiXrayRegressionTest","R17TimingSafetyRegressionTest","CompanionAdmissionRegressionTest");
         boolean first=true;
         for(String suite:suites) {
             List<String> command=new ArrayList<>(List.of(java,"-Xmx256m","-XX:ActiveProcessorCount=2","-Xverify:all","-Dfile.encoding=UTF-8","-Djava.io.tmpdir="+temp,"-cp",tests+File.pathSeparator+testCp,"dev.aegisac."+suite));
             if(suite.equals("TimerSafetyRegressionTest")){command.add(repo.resolve("r16/original-punishments.yml").toString());command.add(repo.resolve("r16/port-source/main/resources/native-punishments.yml").toString());}
+            if(suite.equals("CompanionAdmissionRegressionTest")){for(String input:List.of("meteor-client-0.5.9.jar","paper-api.jar","meteor-client-1.21.11-86.jar","sodium-1.21.11.jar"))command.add(inputs.resolve(input).toString());}
             Path log=out.resolve(suite+".log");Process p=new ProcessBuilder(command).directory(repo.toFile()).redirectErrorStream(true).redirectOutput(log.toFile()).start();int code=p.waitFor();String report=Files.readString(log);
             System.out.println(suite+": exit="+code+" "+report.lines().filter(l->l.contains("PASS")).reduce("",(a,b)->a+" "+b));
             if(!first)results.append(",\n");first=false;results.append("    {\"suite\":\"").append(suite).append("\",\"exit\":").append(code).append("}");

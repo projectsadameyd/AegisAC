@@ -1,0 +1,18 @@
+plugins { id 'fabric-loom' version '1.14.10' }
+version = 'r17-preview2'
+group = 'dev.aegisac'
+base { archivesName = 'AegisAC-Companion' }
+repositories { mavenCentral() }
+loom { splitEnvironmentSourceSets(); mods { aegisac_companion { sourceSet sourceSets.main; sourceSet sourceSets.client } } }
+sourceSets.main.java.srcDir 'shared'
+dependencies {
+    minecraft 'com.mojang:minecraft:1.21.11'
+    mappings loom.officialMojangMappings()
+    modImplementation 'net.fabricmc:fabric-loader:0.19.5'
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.141.6+1.21.11'
+}
+java { sourceCompatibility = JavaVersion.VERSION_21; targetCompatibility = JavaVersion.VERSION_21; withSourcesJar() }
+tasks.withType(JavaCompile).configureEach { options.release = 21; options.encoding = 'UTF-8' }
+processResources { inputs.property 'version', version; filesMatching('fabric.mod.json') { expand version: project.version } }
+jar { from('../LICENSE-COMPANION.txt') { rename { 'LICENSE-AegisAC-Companion.txt' } } }
+tasks.withType(AbstractArchiveTask).configureEach { preserveFileTimestamps = false; reproducibleFileOrder = true }
