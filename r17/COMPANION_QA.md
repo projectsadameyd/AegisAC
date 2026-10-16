@@ -1,3 +1,5 @@
+> Historical Preview 2 validation record. The handshake hotfix and final combined AuthMe protocol tests have since completed. See [HANDSHAKE_HOTFIX_QA.md](HANDSHAKE_HOTFIX_QA.md) for current results and limits.
+
 # R17 Companion Preview 2 validation
 
 Server JAR SHA-256: `654d18386ad94c1f91ed7c7bbb0dcf39c95057868a9d545ca83ee18aa7d3122e`.

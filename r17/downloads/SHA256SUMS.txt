@@ -1,1 +1,2 @@
 cf78185128f1e73a53569168183ded2ffcc01d9f4f642f025cb7370c11c9d4a7  AegisAC-Companion-R17-preview2-1.21.11.jar
+d21f8f8f2304c2df16a783d845ee34770d604228b3e8b08ebf16045c1b5a4862  AegisAC-Companion-R17-preview2-hotfix1-1.21.11.jar

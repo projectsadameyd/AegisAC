@@ -43,9 +43,9 @@ public final class BuildCompanion {
         if(ToolProvider.getSystemJavaCompiler().run(null,System.out,System.err,javac.toArray(String[]::new))!=0)throw new IOException("Companion compilation failed");
         Map<String,byte[]> entries=new TreeMap<>();try(var paths=Files.walk(classesOut)){for(Path p:paths.filter(Files::isRegularFile).toList())entries.put(classesOut.relativize(p).toString().replace('\\','/'),Files.readAllBytes(p));}
         Path resources=R17.resolve("companion/src/main/resources");try(var paths=Files.walk(resources)){for(Path p:paths.filter(Files::isRegularFile).toList())entries.put(resources.relativize(p).toString().replace('\\','/'),Files.readAllBytes(p));}
-        entries.put("fabric.mod.json",new String(entries.get("fabric.mod.json"),StandardCharsets.UTF_8).replace("${version}","r17-preview2").getBytes(StandardCharsets.UTF_8));
+        entries.put("fabric.mod.json",new String(entries.get("fabric.mod.json"),StandardCharsets.UTF_8).replace("${version}","r17-preview2-hotfix1").getBytes(StandardCharsets.UTF_8));
         entries.put("LICENSE-AegisAC-Companion.txt",Files.readAllBytes(R17.resolve("LICENSE-COMPANION.txt")));
-        Path jar=R17.resolve("build/AegisAC-Companion-R17-preview2-1.21.11.jar");try(var out=new ZipOutputStream(Files.newOutputStream(jar))){for(var entry:entries.entrySet()){ZipEntry e=new ZipEntry(entry.getKey());e.setTime(315532800000L);out.putNextEntry(e);out.write(entry.getValue());out.closeEntry();}}
+        Path jar=R17.resolve("build/AegisAC-Companion-R17-preview2-hotfix1-1.21.11.jar");try(var out=new ZipOutputStream(Files.newOutputStream(jar))){for(var entry:entries.entrySet()){ZipEntry e=new ZipEntry(entry.getKey());e.setTime(315532800000L);out.putNextEntry(e);out.write(entry.getValue());out.closeEntry();}}
         String sha=HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(jar)));Files.writeString(BUILD.resolve("SHA256SUMS.txt"),sha+"  "+jar.getFileName()+"\n");
         System.out.println("BUILT "+jar+" bytes="+Files.size(jar)+" sha256="+sha);
     }

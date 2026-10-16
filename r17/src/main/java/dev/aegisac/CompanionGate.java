@@ -29,7 +29,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 
 /** Pre-world admission. Reports come from the player's device and are not hardware attestation. */
 final class CompanionGate implements Listener,PluginMessageListener,AutoCloseable {
-    private static final String DEFAULT_DOWNLOAD="https://github.com/projectsadameyd/AegisAC/raw/refs/heads/development/r17-native-guard/r17/downloads/AegisAC-Companion-R17-preview2-1.21.11.jar";
+    private static final String DEFAULT_DOWNLOAD="https://github.com/projectsadameyd/AegisAC/raw/refs/heads/development/r17-native-guard/r17/downloads/AegisAC-Companion-R17-preview2-hotfix1-1.21.11.jar";
     private static final Key LEAVE=Key.key("aegisac:leave_verification");
     private final AegisPlugin plugin;private final SecureRandom random=new SecureRandom();
     private final ConcurrentMap<PlayerConfigurationConnection,Pending> pending=new ConcurrentHashMap<>();
@@ -52,9 +52,12 @@ final class CompanionGate implements Listener,PluginMessageListener,AutoCloseabl
     void reload()throws IOException {
         File file=new File(plugin.getDataFolder(),"client-guard.yml");if(!file.exists())plugin.saveResource("client-guard.yml",false);
         YamlConfiguration yaml=VpnGate.readStrict(file);String url=yaml.getString("download-url",DEFAULT_DOWNLOAD);
+        boolean migrateDownload=DEFAULT_DOWNLOAD.replace("preview2-hotfix1","preview2").equals(url);
+        if(migrateDownload)url=DEFAULT_DOWNLOAD;
         try{URI uri=URI.create(url);if(!"https".equalsIgnoreCase(uri.getScheme())||uri.getHost()==null||uri.getUserInfo()!=null||url.length()>1000)throw new IllegalArgumentException();}catch(IllegalArgumentException e){throw new IOException("download-url must be an HTTPS URL without credentials");}
         int handshake=yaml.getInt("handshake-timeout-seconds",12),screen=yaml.getInt("block-screen-seconds",30);
         if(handshake<5||handshake>20||screen<5||screen>40)throw new IOException("Handshake must be 5..20 seconds and block screen 5..40 seconds");
+        if(migrateDownload){yaml.set("download-url",url);yaml.save(file);plugin.getLogger().info("Updated the Preview 2 companion download to the handshake hotfix.");}
         settings=new Settings(yaml.getBoolean("enabled",true),url,handshake,screen);startupError=null;
     }
     @EventHandler(priority=EventPriority.LOWEST)
@@ -70,10 +73,20 @@ final class CompanionGate implements Listener,PluginMessageListener,AutoCloseabl
         try {
             if(startupError!=null){block(connection,session,policy,"Verification unavailable",startupError);return;}
             connection.getAudience().showDialog(screen(policy,"Checking your client","AegisAC is checking loaded mod code for known prohibited client signatures. Your other files are not scanned. Please wait."));
-            connection.sendPluginMessage(plugin,AdmissionProtocol.CHALLENGE,AdmissionProtocol.encode(session.challenge));
-            AdmissionProtocol.Report report;
-            try{report=session.report.get(policy.handshakeSeconds(),TimeUnit.SECONDS);}
-            catch(TimeoutException e){failed.incrementAndGet();block(connection,session,policy,"Companion required","Install the AegisAC companion and Fabric API for Minecraft 1.21.11, then restart Minecraft and reconnect. If it is already installed, the check did not finish in time.");return;}
+            byte[] challengeBytes=AdmissionProtocol.encode(session.challenge);
+            long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(policy.handshakeSeconds());
+            boolean challengeSent=false;
+            AdmissionProtocol.Report report=null;
+            while(!closed&&connection.isConnected()) {
+                if(!challengeSent&&connection.getListeningPluginChannels().contains(AdmissionProtocol.CHALLENGE)) {
+                    connection.sendPluginMessage(plugin,AdmissionProtocol.CHALLENGE,challengeBytes);challengeSent=true;
+                }
+                long remaining=deadline-System.nanoTime();if(remaining<=0)break;
+                try{report=session.report.get(Math.min(remaining,TimeUnit.MILLISECONDS.toNanos(50)),TimeUnit.NANOSECONDS);break;}
+                catch(TimeoutException waiting){/* A client may advertise its receiver after this event begins. */}
+            }
+            if(closed||!connection.isConnected())return;
+            if(report==null){failed.incrementAndGet();plugin.getLogger().warning("Companion verification timed out for "+connection.getProfile().getName()+": challengeSent="+challengeSent+"; install preview2-hotfix1 and check the client log.");block(connection,session,policy,"Companion required","Install the AegisAC companion and Fabric API for Minecraft 1.21.11, then restart Minecraft and reconnect. If it is already installed, the check did not finish in time.");return;}
             if(closed||!connection.isConnected())return;
             if(!AdmissionProtocol.supported(report)){failed.incrementAndGet();block(connection,session,policy,"Companion update required","Install the matching AegisAC companion for this server, restart Minecraft, and reconnect.");return;}
             if(report.findings().stream().anyMatch(f->!CheatSignatures.known(f))){failed.incrementAndGet();block(connection,session,policy,"Verification failed","The companion reported an unsupported check result. Update the companion or contact server staff.");return;}

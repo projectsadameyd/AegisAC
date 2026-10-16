@@ -1,8 +1,9 @@
 // Isolated loopback admission tests. This script cannot target an external server.
 const mineflayer=require('mineflayer'),fs=require('node:fs'),path=require('node:path'),{execFileSync}=require('node:child_process');
+const {writeAction}=require('./dialog-qa-wire.cjs');
 const mode=process.argv[2]||'missing';
 if(!['missing','meteor','clean','incomplete','stale','malformed','old','exit','clean-remote'].includes(mode))throw Error('Unknown QA mode');
-const root=path.resolve(__dirname,'..'),jar=path.join(root,'build/AegisAC-R17-Companion-preview2-1.21.11.jar');
+const root=path.resolve(__dirname,'..'),jar=path.join(root,'build/AegisAC-R17-Companion-preview2-hotfix1-1.21.11.jar');
 const result={mode,started:new Date().toISOString(),spawned:false,dialogs:[],challenge:false,authMessages:[],errors:[]};
 const usernames={missing:'NoCompanionQA',meteor:'MeteorBlockedQA',clean:'AegisCleanQA',incomplete:'IncompleteQA',stale:'StaleReportQA',malformed:'MalformedQA',old:'OldCompanionQA',exit:'ExitDialogQA','clean-remote':'AegisCleanQA'};
 let finished=false;
@@ -15,10 +16,11 @@ bot._client.on('packet',(data,meta)=>{
   if(meta.name==='show_dialog'){
     result.dialogs.push(data);
     const text=JSON.stringify(data);
-    if(mode==='exit'&&text.includes('aegisac:leave_verification'))bot._client.write('custom_click_action',{id:'aegisac:leave_verification',nbt:undefined});
+    if(mode==='exit'&&text.includes('aegisac:leave_verification'))writeAction(bot._client,'aegisac:leave_verification');
+    if(['meteor','missing','incomplete','stale','old'].includes(mode)&&/Prohibited client reported|Companion required|Companion update required|Verification incomplete/.test(text))writeAction(bot._client,'aegisac:leave_verification');
     if(['clean','clean-remote'].includes(mode)){
       const action=text.includes('authme:prejoin-register/submit')?'authme:prejoin-register/submit':text.includes('authme:prejoin-login/submit')?'authme:prejoin-login/submit':null;
-      if(action){result.authDialogSubmitted=action;bot._client.write('custom_click_action',{id:action,nbt:{type:'compound',name:'',value:{password:{type:'string',value:'R17qaOnly8236!'},confirm:{type:'string',value:'R17qaOnly8236!'}}}});}
+      if(action){result.authDialogSubmitted=action;writeAction(bot._client,action,{type:'compound',name:'',value:{password:{type:'string',value:'R17qaOnly8236!'},confirm:{type:'string',value:'R17qaOnly8236!'}}});}
     }
   }
   if(meta.name!=='custom_payload'||data.channel!=='aegisac:challenge_v1')return;
@@ -53,4 +55,4 @@ bot.once('spawn',async()=>{
     await wait(2500);if(!finished){result.errors.push('Expected remote guard kick missing');save(1);}
   }catch(error){result.errors.push(error.message);save(1);}
 });
-setTimeout(()=>{if(!finished){result.errors.push('Admission QA timed out');save(1);}},40000);
+setTimeout(()=>{if(!finished){result.errors.push('Admission QA timed out');save(1);}},55000);

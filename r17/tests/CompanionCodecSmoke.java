@@ -13,6 +13,11 @@ public final class CompanionCodecSmoke {
         var report=new AdmissionProtocol.Report(nonce,AdmissionProtocol.BUILD,1,AdmissionProtocol.Outcome.KNOWN_MATCH,2,1200,20,List.of("METEOR_CODE_V1"));
         roundTrip("ReportPayload",AdmissionProtocol.encode(report));
         try{decode("ChallengePayload",new byte[AdmissionProtocol.MAX_BYTES+1]);throw new AssertionError("Oversized codec payload accepted");}catch(InvocationTargetException e){require(e.getCause() instanceof IllegalArgumentException,"Codec size error");}
+        Object registration=Class.forName("dev.aegisac.companion.AegisCompanionClient").getMethod("channelRegistration").invoke(null);
+        Object registerCodec=registration.getClass().getField("REGISTER_CODEC").get(null),registerBuffer=buffer(new byte[0]);
+        Method encode=Arrays.stream(Class.forName("net.minecraft.class_9139").getMethods()).filter(m->m.getParameterCount()==2&&m.getReturnType()==void.class).findFirst().orElseThrow();
+        encode.invoke(registerCodec,registerBuffer,registration);Class<?> byteBuf=Class.forName("io.netty.buffer.ByteBuf");int n=(Integer)byteBuf.getMethod("readableBytes").invoke(registerBuffer);byte[] wire=new byte[n];byteBuf.getMethod("readBytes",byte[].class).invoke(registerBuffer,(Object)wire);byteBuf.getMethod("release").invoke(registerBuffer);
+        require(Arrays.equals(wire,AdmissionProtocol.CHALLENGE.getBytes(java.nio.charset.StandardCharsets.UTF_8)),"Fabric receiver registration is not Paper-compatible raw UTF-8");
         System.out.println("PASS "+assertions+" actual production Minecraft/Fabric payload-codec assertions");
     }
     static void roundTrip(String name,byte[] bytes)throws Exception {

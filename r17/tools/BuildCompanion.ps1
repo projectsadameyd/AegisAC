@@ -35,7 +35,7 @@ try {
     $r17ToolCp=((Get-ChildItem -LiteralPath 'r17\inputs\companion-tooling' -File -Filter '*.jar').FullName -join [IO.Path]::PathSeparator)
     & java -Xmx1024m -XX:ActiveProcessorCount=2 -cp $r17ToolCp 'r17\tools\BuildCompanion.java'
     if($LASTEXITCODE -ne 0){throw 'Companion build failed'}
-    $r17Cp=@((Join-Path $r17Repo 'r17\build\AegisAC-Companion-R17-preview2-1.21.11.jar'),(Join-Path $r17Repo 'r17\build\companion-direct\minecraft-intermediary'),(Join-Path $r17Repo 'r17\inputs\fabric-loader-0.19.5.jar'),(Join-Path $r17Repo 'r17\inputs\fabric-api-base-1.0.5+4ebb5c083e.jar'),(Join-Path $r17Repo 'r17\inputs\fabric-networking-api-v1-5.1.6+6b6d71a53e.jar'))
+    $r17Cp=@((Join-Path $r17Repo 'r17\build\AegisAC-Companion-R17-preview2-hotfix1-1.21.11.jar'),(Join-Path $r17Repo 'r17\build\companion-direct\minecraft-intermediary'),(Join-Path $r17Repo 'r17\inputs\fabric-loader-0.19.5.jar'),(Join-Path $r17Repo 'r17\inputs\fabric-api-base-1.0.5+4ebb5c083e.jar'),(Join-Path $r17Repo 'r17\inputs\fabric-networking-api-v1-5.1.6+6b6d71a53e.jar'))
     foreach($r17LibRoot in @('r17\inputs\companion-libraries','r17\server-test\libraries')){if(Test-Path -LiteralPath $r17LibRoot){$r17Cp+=(Get-ChildItem -LiteralPath $r17LibRoot -Recurse -File -Filter '*.jar').FullName}}
     & java -Xmx256m -XX:ActiveProcessorCount=2 -cp ($r17Cp -join [IO.Path]::PathSeparator) 'r17\tests\CompanionCodecSmoke.java'
     if($LASTEXITCODE -ne 0){throw 'Companion payload codec verification failed'}

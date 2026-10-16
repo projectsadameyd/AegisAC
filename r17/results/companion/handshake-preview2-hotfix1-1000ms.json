@@ -1,0 +1,9 @@
+{
+  "delay": 1000,
+  "flavor": "preview2-hotfix1",
+  "challenge": true,
+  "registered": true,
+  "spawned": true,
+  "reportSent": true,
+  "authDialog": "authme:prejoin-login/submit"
+}
