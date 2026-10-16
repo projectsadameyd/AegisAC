@@ -1,0 +1,48 @@
+{
+  "hotfix": "preview2-hotfix2",
+  "artifacts": {
+    "AegisAC-R17-Companion-preview2-hotfix2-1.21.11.jar": "fb6f69b36723e7e07c5d2e5b6bd9cd0eac2f31539d7061330b29986c0b33b0bb",
+    "AegisAC-Companion-R17-preview2-hotfix2-1.21.11.jar": "feedb0ddd2d88f7d91b88e74970241ecb632de1aad343acc568779ab68baabac"
+  },
+  "production_payload_and_lifecycle_assertions": 9,
+  "broken_hotfix1_rejected_by_lifecycle_regression": true,
+  "server_regression": {
+    "r16_engine_classes_unchanged": 5931,
+    "java": "25.0.4.1",
+    "suites": [
+      {
+        "suite": "NativeActionRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "DispatcherHistoryRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "TimerSafetyRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "VpnSourceRecoveryRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "RemoteInteractionRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "AntiXrayRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "R17TimingSafetyRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "CompanionAdmissionRegressionTest",
+        "exit": 0
+      }
+    ]
+  },
+  "real_BlueClient_reconnect_after_fix": "pending user installation; not yet observed"
+}

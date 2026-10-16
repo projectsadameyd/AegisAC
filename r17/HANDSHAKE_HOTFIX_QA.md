@@ -1,3 +1,5 @@
+> Superseded validation record. Hotfix 1 has a confirmed Fabric INIT packet bug. Use Hotfix 2 and see [CLIENT_LIFECYCLE_HOTFIX_QA.md](CLIENT_LIFECYCLE_HOTFIX_QA.md) for the correction and actual validation limits.
+
 # R17 Preview 2 - Handshake Hotfix 1
 
 Built and tested on 15 October 2026 for Paper 1.21.11 and Fabric 1.21.11.

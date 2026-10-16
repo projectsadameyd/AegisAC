@@ -1,3 +1,5 @@
+> Superseded validation record. Hotfix 1 has a confirmed Fabric INIT packet bug. Use Hotfix 2 and see [CLIENT_LIFECYCLE_HOTFIX_QA.md](CLIENT_LIFECYCLE_HOTFIX_QA.md) for the correction and actual validation limits.
+
 > Historical Preview 2 validation record. The handshake hotfix and final combined AuthMe protocol tests have since completed. See [HANDSHAKE_HOTFIX_QA.md](HANDSHAKE_HOTFIX_QA.md) for current results and limits.
 
 # R17 Companion Preview 2 validation

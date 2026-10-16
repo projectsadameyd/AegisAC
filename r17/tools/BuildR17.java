@@ -38,7 +38,7 @@ public final class BuildR17 {
         Path generated=out.resolve("generated/dev/aegisac");Files.createDirectories(generated);
         String addon=read(repo.resolve("r16/port-source/main/java/dev/aegisac/AegisGrimAddon.java"));
         addon=replace(addon,"R16-VPNGUARD1","R17-NATIVE-GUARD1");
-        addon=replace(addon,"R17-NATIVE-GUARD1","R17-COMPANION2-HF1");
+        addon=replace(addon,"R17-NATIVE-GUARD1","R17-COMPANION2-HF2");
         addon=replace(addon,"               && !\"TimerLimit\".equalsIgnoreCase(var3.getCheckName())","               && !\"TimerLimit\".equalsIgnoreCase(var3.getCheckName())\n               && !R17SanctionSafety.timingOnly(var3.getCheckName())");
         addon=replace(addon,"   private void nativeAction(UUID var1, String var2, String var3, String var4, String var5, Check var6) {","   private void nativeAction(UUID var1, String var2, String var3, String var4, String var5, Check var6) {\n      if (R17SanctionSafety.timingOnly(var4)) return;");
         addon=replace(addon,"      if (var4.length > 0 && this.admin.handle(var1, var4)) {","      if (var4.length > 0 && this.plugin.companion() != null && this.plugin.companion().command(var1, var4)) return true;\n      if (var4.length > 0 && this.plugin.guard() != null && this.plugin.guard().command(var1, var4)) return true;\n\n      if (var4.length > 0 && this.admin.handle(var1, var4)) {");
@@ -55,12 +55,12 @@ public final class BuildR17 {
         Map<String,byte[]> overlay=new TreeMap<>();
         for(Path p:files(classes,".class"))overlay.put(classes.relativize(p).toString().replace('\\','/'),Files.readAllBytes(p));
         Path resources=root.resolve("src/main/resources");for(Path p:files(resources,null))overlay.put(resources.relativize(p).toString().replace('\\','/'),Files.readAllBytes(p));
-        String plugin=read(repo.resolve("r16/port-source/main/resources/plugin.yml")).replaceFirst("(?m)^version:.*$","version: 4.3.0-r17-companion-preview2-hotfix1-mc1.21.11");
+        String plugin=read(repo.resolve("r16/port-source/main/resources/plugin.yml")).replaceFirst("(?m)^version:.*$","version: 4.3.0-r17-companion-preview2-hotfix2-mc1.21.11");
         plugin+="\n  aegisac.guard.bypass:\n    description: Explicit bypass for the R17 remote action guard\n    default: false\n";
         overlay.put("plugin.yml",plugin.getBytes(StandardCharsets.UTF_8));
-        overlay.put("aegis-compatibility.json",("{\"minecraft_version\":\"1.21.11\",\"runtime_java_minimum\":21,\"aegis_build\":\"R17-COMPANION2-HF1-preview2-hotfix1\",\"base_release\":\"v4.2.0-r16-vpnguard1\",\"server_client_filesystem_access\":false,\"required_companion\":\"Fabric 1.21.11; known loaded-code signatures; reports are forgeable\",\"passive_freecam_detection\":false,\"remote_interaction_prevention\":true,\"anti_xray\":\"per-world configuration; restart required\",\"validation\":\"see QA_REPORT.md and COMPANION_QA.md\"}\n").getBytes(StandardCharsets.UTF_8));
+        overlay.put("aegis-compatibility.json",("{\"minecraft_version\":\"1.21.11\",\"runtime_java_minimum\":21,\"aegis_build\":\"R17-COMPANION2-HF2-preview2-hotfix2\",\"base_release\":\"v4.2.0-r16-vpnguard1\",\"server_client_filesystem_access\":false,\"required_companion\":\"Fabric 1.21.11; known loaded-code signatures; reports are forgeable\",\"passive_freecam_detection\":false,\"remote_interaction_prevention\":true,\"anti_xray\":\"per-world configuration; restart required\",\"validation\":\"see QA_REPORT.md and COMPANION_QA.md\"}\n").getBytes(StandardCharsets.UTF_8));
         if(Files.exists(root.resolve("THIRD_PARTY_NOTICES.md")))overlay.put("R17-THIRD_PARTY_NOTICES.md",Files.readAllBytes(root.resolve("THIRD_PARTY_NOTICES.md")));
-        Path jar=out.resolve("AegisAC-R17-Companion-preview2-hotfix1-1.21.11.jar");
+        Path jar=out.resolve("AegisAC-R17-Companion-preview2-hotfix2-1.21.11.jar");
         try(ZipFile base=new ZipFile(inputs.resolve(BASE_NAME).toFile());ZipOutputStream z=new ZipOutputStream(Files.newOutputStream(jar))) {
             TreeSet<String> names=new TreeSet<>(overlay.keySet());base.stream().filter(e->!e.isDirectory()).forEach(e->names.add(e.getName()));
             for(String name:names) {

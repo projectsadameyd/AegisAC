@@ -1,5 +1,5 @@
 plugins { id 'fabric-loom' version '1.14.10' }
-version = 'r17-preview2-hotfix1'
+version = '0.17.0-preview2.hotfix2'
 group = 'dev.aegisac'
 base { archivesName = 'AegisAC-Companion' }
 repositories { mavenCentral() }

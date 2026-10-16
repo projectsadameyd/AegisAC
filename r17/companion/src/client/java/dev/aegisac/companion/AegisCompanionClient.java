@@ -37,16 +37,17 @@ public final class AegisCompanionClient implements ClientModInitializer {
     }
     private static byte[] read(FriendlyByteBuf buf){int n=buf.readableBytes();if(n>AdmissionProtocol.MAX_BYTES)throw new IllegalArgumentException("AegisAC payload exceeds limit");byte[] data=new byte[n];buf.readBytes(data);return data;}
     // Fabric normally announces configuration receivers after a server registration payload.
-    // Paper gates outgoing messages on the client's advertised channels, so announce ours at INIT.
+    // Paper gates outgoing messages on the client's advertised channels, so announce ours at START.
+    // INIT runs while Minecraft may still use the LOGIN outbound codec: sending there disconnects clients.
     // Use Fabric's existing reserved-channel payload/codec; do not register a competing codec.
     public static RegistrationPayload channelRegistration(){return new RegistrationPayload(RegistrationPayload.REGISTER,List.of(Identifier.parse(AdmissionProtocol.CHALLENGE)));}
     @Override public void onInitializeClient() {
         PayloadTypeRegistry.configurationS2C().register(ChallengePayload.TYPE,ChallengePayload.CODEC);
         PayloadTypeRegistry.configurationC2S().register(ReportPayload.TYPE,ReportPayload.CODEC);
-        ClientConfigurationConnectionEvents.INIT.register((handler,client)->{
-            connectionEpoch.incrementAndGet();
+        ClientConfigurationConnectionEvents.INIT.register((handler,client)->connectionEpoch.incrementAndGet());
+        ClientConfigurationConnectionEvents.START.register((handler,client)->{
             ClientConfigurationNetworking.getSender().sendPacket(channelRegistration());
-            LOG.info("AegisAC configuration receiver announced (preview2-hotfix1).");
+            LOG.info("AegisAC configuration receiver announced (preview2-hotfix2).");
         });
         ClientConfigurationConnectionEvents.DISCONNECT.register((handler,client)->{connectionEpoch.incrementAndGet();scanner.getQueue().clear();});
         ClientConfigurationNetworking.registerGlobalReceiver(ChallengePayload.TYPE,(payload,context)->{

@@ -37,7 +37,7 @@ public final class AegisPlugin extends GrimACBukkitLoaderPlugin {
         AegisGrimAddon.configureBranding();
         try{guard=new NativeGuard(this);}catch(IOException error){getLogger().severe("R17 interaction protection did not enable: "+error.getMessage());}
         companion=new CompanionGate(this);
-        getLogger().info("R17-COMPANION2-HF1: AegisAC detection, remote interaction protection and required companion admission. Use /aegis client status.");
+        getLogger().info("R17-COMPANION2-HF2: AegisAC detection, remote interaction protection and required companion admission. Use /aegis client status.");
         getServer().getScheduler().runTaskTimer(this,()->getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&',"&eMade by @_adam814")),12000,12000);
     }
     @Override public void onDisable() {

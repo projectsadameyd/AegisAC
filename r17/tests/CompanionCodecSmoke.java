@@ -18,6 +18,14 @@ public final class CompanionCodecSmoke {
         Method encode=Arrays.stream(Class.forName("net.minecraft.class_9139").getMethods()).filter(m->m.getParameterCount()==2&&m.getReturnType()==void.class).findFirst().orElseThrow();
         encode.invoke(registerCodec,registerBuffer,registration);Class<?> byteBuf=Class.forName("io.netty.buffer.ByteBuf");int n=(Integer)byteBuf.getMethod("readableBytes").invoke(registerBuffer);byte[] wire=new byte[n];byteBuf.getMethod("readBytes",byte[].class).invoke(registerBuffer,(Object)wire);byteBuf.getMethod("release").invoke(registerBuffer);
         require(Arrays.equals(wire,AdmissionProtocol.CHALLENGE.getBytes(java.nio.charset.StandardCharsets.UTF_8)),"Fabric receiver registration is not Paper-compatible raw UTF-8");
+        Object entry=Class.forName("dev.aegisac.companion.AegisCompanionClient").getConstructor().newInstance();
+        entry.getClass().getMethod("onInitializeClient").invoke(entry);
+        Object initEvent=Class.forName("net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationConnectionEvents").getField("INIT").get(null);
+        Object initInvoker=Class.forName("net.fabricmc.fabric.api.event.Event").getMethod("invoker").invoke(initEvent);
+        Method init=Class.forName("net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationConnectionEvents$Init").getMethods()[0];
+        init.invoke(initInvoker,new Object[]{null,null});
+        Field epoch=entry.getClass().getDeclaredField("connectionEpoch");epoch.setAccessible(true);
+        require(((java.util.concurrent.atomic.AtomicLong)epoch.get(entry)).get()==1,"INIT must advance the connection epoch without attempting to send a configuration packet");
         System.out.println("PASS "+assertions+" actual production Minecraft/Fabric payload-codec assertions");
     }
     static void roundTrip(String name,byte[] bytes)throws Exception {

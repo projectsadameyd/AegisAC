@@ -1,12 +1,12 @@
-# AegisAC R17 Companion Preview 2 - Handshake Hotfix 1
+# AegisAC R17 Companion Preview 2 - Client Lifecycle Hotfix 2
 
 R17 keeps the published R16 detection stack. Preview 2 adds a required Fabric companion and an AegisAC download/block dialog before players enter a world. The server plugin is for Paper 1.21.11; the companion is for Fabric 1.21.11. This remains a preview for testing before production deployment. See COMPANION_QA.md for the current validation scope; QA_REPORT.md records Preview 1's baseline tests.
 
 ## Handshake hotfix
 
-The companion explicitly announces its configuration receiver at INIT. The server waits within the existing admission deadline for that channel before sending its single challenge. This fixes the Preview 2 first-message race and the Fabric/Paper registration deadlock. The wire protocol and signature policy stay compatible with Preview 2. The stock old download URL is migrated to the hotfix; custom download URLs are retained.
+The companion explicitly announces its configuration receiver at START. The server waits within the existing admission deadline for that channel before sending its single challenge. This fixes the Preview 2 first-message race and the Fabric/Paper registration deadlock. The wire protocol and signature policy stay compatible with Preview 2. The stock old download URL is migrated to the hotfix; custom download URLs are retained.
 
-See HANDSHAKE_HOTFIX_QA.md for targeted validation. Both server and client hotfix JARs are recommended. Fully restart Minecraft and the server after replacing them.
+See CLIENT_LIFECYCLE_HOTFIX_QA.md for current validation. Hotfix 1 sent a packet during INIT and is superseded. Both server and client hotfix JARs are recommended. Fully restart Minecraft and the server after replacing them.
 
 ## Included
 
@@ -35,8 +35,8 @@ Anti-Xray reduces what terrain information reaches a client. It is not an imposs
 ## Install
 
 1. Stop the server and back up its existing AegisAC data, plugin JAR and world configuration files.
-2. Keep one AegisAC server JAR in `plugins/`, replacing the old JAR with `AegisAC-R17-Companion-preview2-hotfix1-1.21.11.jar`. Never put the companion in the server plugins folder.
-3. Players install Fabric Loader 0.19.5+, Fabric API 0.141.6+ for 1.21.11 and `AegisAC-Companion-R17-preview2-hotfix1-1.21.11.jar` in their own Minecraft `mods/` folder, then restart Minecraft. Other mods are permitted unless their code matches a prohibited signature.
+2. Keep one AegisAC server JAR in `plugins/`, replacing the old JAR with `AegisAC-R17-Companion-preview2-hotfix2-1.21.11.jar`. Never put the companion in the server plugins folder.
+3. Players install Fabric Loader 0.19.5+, Fabric API 0.141.6+ for 1.21.11 and `AegisAC-Companion-R17-preview2-hotfix2-1.21.11.jar` in their own Minecraft `mods/` folder, then restart Minecraft. Other mods are permitted unless their code matches a prohibited signature.
 4. Start Paper 1.21.11 with Java 21 or newer. Existing AegisAC data, AuthMe data, credentials, bans and permission nodes are retained. Settings are in `plugins/AegisAC/client-guard.yml` and `r17-guard.yml`. Companion admission defaults to required; test on a copy first.
 5. Run `/aegis client status`. The default download link points to this development branch's companion artifact; operators may host the exact JAR elsewhere and set `download-url` to their HTTPS download URL.
 6. Run `/aegis guard status` and `/aegis xray status`.
