@@ -1,4 +1,10 @@
-# AegisAC R17 Companion Preview 2 - Client Lifecycle Hotfix 2
+# AegisAC R17 Companion Preview 2 - Username Exemptions (Server Hotfix 3)
+
+Hotfix 3 adds persistent companion exemptions for Paper 1.21.11. The working Hotfix 2 client remains compatible and does not need to be replaced. The server JAR is `AegisAC-R17-Companion-preview2-hotfix3-1.21.11.jar`.
+
+Use `/aegis client exempt add <username>`, `/aegis client exempt remove <username>` and `/aegis client exempt list` with `aegisac.admin` or the server console. Changes save immediately to `plugins/AegisAC/client-guard.yml` and apply on the player's next connection. Names are matched exactly without case sensitivity. Listed players receive no Aegis companion dialog or scan challenge and can join without the companion mod. AuthMe authentication, VPN screening and normal anticheat checks continue.
+
+Alternatively set `exempt-usernames: ['PlayerName', 'AnotherPlayer']` in that file and run `/aegis client reload`. The default list is empty. On an offline-mode server the exemption uses the name claimed before AuthMe authenticates it, so it must never be used to bypass AuthMe. See COMPANION_EXEMPTIONS_QA.md for validation.
 
 R17 keeps the published R16 detection stack. Preview 2 adds a required Fabric companion and an AegisAC download/block dialog before players enter a world. The server plugin is for Paper 1.21.11; the companion is for Fabric 1.21.11. This remains a preview for testing before production deployment. See COMPANION_QA.md for the current validation scope; QA_REPORT.md records Preview 1's baseline tests.
 
@@ -10,7 +16,7 @@ See CLIENT_LIFECYCLE_HOTFIX_QA.md for current validation. Hotfix 1 sent a packet
 
 ## Included
 
-- A mandatory companion check during Paper's configuration phase, before world access. There is no OP bypass. AuthMe continues to authenticate afterward, using its own pre-join dialog on versions that support it, or its ordinary in-world login flow.
+- A companion check during Paper's configuration phase, before world access, except for explicitly listed usernames. OP status alone does not bypass it. AuthMe continues to authenticate afterward, using its own pre-join dialog on versions that support it, or its ordinary in-world login flow.
 - Native Minecraft dialogs with a companion download button, Fabric API link, instructions and disconnect button. Download opens the browser; Minecraft cannot install a Java mod from this screen.
 - A client-side scan of loaded mod origins for curated compiled-code family signatures. No filename blacklist, generic Fabric rejection, blanket script rejection, unrelated-file scanning, full mod-list upload or machine identifier collection.
 - Known signature matches, missing/outdated companions and incomplete checks cannot grant entry. An incomplete check is described as a verification failure, not proof of cheating. No persistent ban or sanction stage is created.
@@ -35,7 +41,7 @@ Anti-Xray reduces what terrain information reaches a client. It is not an imposs
 ## Install
 
 1. Stop the server and back up its existing AegisAC data, plugin JAR and world configuration files.
-2. Keep one AegisAC server JAR in `plugins/`, replacing the old JAR with `AegisAC-R17-Companion-preview2-hotfix2-1.21.11.jar`. Never put the companion in the server plugins folder.
+2. Keep one AegisAC server JAR in `plugins/`, replacing the old JAR with `AegisAC-R17-Companion-preview2-hotfix3-1.21.11.jar`. Never put the companion in the server plugins folder.
 3. Players install Fabric Loader 0.19.5+, Fabric API 0.141.6+ for 1.21.11 and `AegisAC-Companion-R17-preview2-hotfix2-1.21.11.jar` in their own Minecraft `mods/` folder, then restart Minecraft. Other mods are permitted unless their code matches a prohibited signature.
 4. Start Paper 1.21.11 with Java 21 or newer. Existing AegisAC data, AuthMe data, credentials, bans and permission nodes are retained. Settings are in `plugins/AegisAC/client-guard.yml` and `r17-guard.yml`. Companion admission defaults to required; test on a copy first.
 5. Run `/aegis client status`. The default download link points to this development branch's companion artifact; operators may host the exact JAR elsewhere and set `download-url` to their HTTPS download URL.
@@ -53,6 +59,9 @@ Existing `/aegis` commands remain available. Added commands:
 | --- | --- |
 | `/aegis client status` | Required-companion status, report/block counters and AuthMe presence |
 | `/aegis client reload` | Reload admission settings for new connections |
+| `/aegis client exempt add <username>` | Save a username that skips companion admission on their next connection |
+| `/aegis client exempt remove <username>` | Require companion admission again on their next connection |
+| `/aegis client exempt list` | List current companion exemptions |
 | `/aegis guard status` | Guard counters and capability summary |
 | `/aegis guard reload` | Reload `r17-guard.yml`; clear pending guard evidence |
 | `/aegis xray status` | Configuration results; indicates on-disk state |

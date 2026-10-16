@@ -1,0 +1,53 @@
+{
+  "build": "preview2-hotfix3",
+  "minecraft": "1.21.11",
+  "companion": "Existing preview2-hotfix2 remains compatible and unchanged",
+  "assertions": 1812,
+  "exemption_assertions": 34,
+  "engine_classes_unchanged": 5931,
+  "artifact": "AegisAC-R17-Companion-preview2-hotfix3-1.21.11.jar",
+  "sha256": "08cb875f54be175b3a25ef0f3e79a91bcc3349fd5cf0ae56791ecfcca36eb30e",
+  "end_to_end_join": "Not completed: local isolated server world/log files were locked",
+  "regression": {
+    "r16_engine_classes_unchanged": 5931,
+    "java": "25.0.4.1",
+    "suites": [
+      {
+        "suite": "NativeActionRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "DispatcherHistoryRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "TimerSafetyRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "VpnSourceRecoveryRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "RemoteInteractionRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "AntiXrayRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "R17TimingSafetyRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "CompanionAdmissionRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "CompanionExemptionRegressionTest",
+        "exit": 0
+      }
+    ]
+  }
+}

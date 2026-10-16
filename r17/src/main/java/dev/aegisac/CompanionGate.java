@@ -34,22 +34,22 @@ final class CompanionGate implements Listener,PluginMessageListener,AutoCloseabl
     private final AegisPlugin plugin;private final SecureRandom random=new SecureRandom();
     private final ConcurrentMap<PlayerConfigurationConnection,Pending> pending=new ConcurrentHashMap<>();
     private final Semaphore slots=new Semaphore(16);private final ConcurrentMap<String,Integer> addresses=new ConcurrentHashMap<>();
-    private final AtomicLong passed=new AtomicLong(),matched=new AtomicLong(),failed=new AtomicLong(),replayed=new AtomicLong(),busy=new AtomicLong();
+    private final AtomicLong passed=new AtomicLong(),matched=new AtomicLong(),failed=new AtomicLong(),replayed=new AtomicLong(),busy=new AtomicLong(),exempted=new AtomicLong();
     private volatile Settings settings;private volatile boolean closed;private volatile String startupError;
-    private record Settings(boolean enabled,String download,int handshakeSeconds,int screenSeconds){}
+    private record Settings(boolean enabled,String download,int handshakeSeconds,int screenSeconds,Set<String> exemptNames){}
     private static final class Pending {
         final AdmissionProtocol.Challenge challenge;final CompletableFuture<AdmissionProtocol.Report> report=new CompletableFuture<>();final CompletableFuture<Boolean> leave=new CompletableFuture<>();
         Pending(AdmissionProtocol.Challenge c){challenge=c;}
     }
     CompanionGate(AegisPlugin plugin) {
         this.plugin=plugin;
-        try{reload();}catch(IOException error){startupError="Invalid client-guard.yml; staff must correct the configuration.";settings=new Settings(true,DEFAULT_DOWNLOAD,12,30);plugin.getLogger().severe(startupError+" "+error.getMessage());}
+        try{reload();}catch(IOException error){startupError="Invalid client-guard.yml; staff must correct the configuration.";settings=new Settings(true,DEFAULT_DOWNLOAD,12,30,Set.of());plugin.getLogger().severe(startupError+" "+error.getMessage());}
         Bukkit.getPluginManager().registerEvents(this,plugin);
         Bukkit.getMessenger().registerOutgoingPluginChannel(plugin,AdmissionProtocol.CHALLENGE);
         Bukkit.getMessenger().registerIncomingPluginChannel(plugin,AdmissionProtocol.REPORT,this);
         plugin.getLogger().info("R17 companion admission="+(settings.enabled()?"REQUIRED":"DISABLED")+"; pre-world dialog; client reports are untrusted; AuthMe login is unchanged.");
     }
-    void reload()throws IOException {
+    synchronized void reload()throws IOException {
         File file=new File(plugin.getDataFolder(),"client-guard.yml");if(!file.exists())plugin.saveResource("client-guard.yml",false);
         YamlConfiguration yaml=VpnGate.readStrict(file);String url=yaml.getString("download-url",DEFAULT_DOWNLOAD);
         boolean migrateDownload=DEFAULT_DOWNLOAD.replace("preview2-hotfix2","preview2").equals(url)||DEFAULT_DOWNLOAD.replace("preview2-hotfix2","preview2-hotfix1").equals(url);
@@ -57,14 +57,22 @@ final class CompanionGate implements Listener,PluginMessageListener,AutoCloseabl
         try{URI uri=URI.create(url);if(!"https".equalsIgnoreCase(uri.getScheme())||uri.getHost()==null||uri.getUserInfo()!=null||url.length()>1000)throw new IllegalArgumentException();}catch(IllegalArgumentException e){throw new IOException("download-url must be an HTTPS URL without credentials");}
         int handshake=yaml.getInt("handshake-timeout-seconds",12),screen=yaml.getInt("block-screen-seconds",30);
         if(handshake<5||handshake>20||screen<5||screen>40)throw new IOException("Handshake must be 5..20 seconds and block screen 5..40 seconds");
+        Set<String> exemptNames=CompanionExemptions.read(yaml);
         if(migrateDownload){yaml.set("download-url",url);yaml.save(file);plugin.getLogger().info("Updated the Preview 2 companion download to the handshake hotfix.");}
-        settings=new Settings(yaml.getBoolean("enabled",true),url,handshake,screen);startupError=null;
+        settings=new Settings(yaml.getBoolean("enabled",true),url,handshake,screen,exemptNames);startupError=null;
+    }
+    private synchronized boolean changeExemption(String username,boolean exempt)throws IOException {
+        reload();
+        boolean changed=CompanionExemptions.update(new File(plugin.getDataFolder(),"client-guard.yml"),username,exempt);
+        if(changed)reload();
+        return changed;
     }
     @EventHandler(priority=EventPriority.LOWEST)
     public void configure(AsyncPlayerConnectionConfigureEvent event) {
         Settings policy=settings;if(!policy.enabled())return;
         PlayerConfigurationConnection connection=event.getConnection();
         if(closed){connection.disconnect(message("Verification unavailable","Please reconnect after the server finishes restarting."));return;}
+        if(startupError==null&&CompanionExemptions.contains(policy.exemptNames(),connection.getProfile().getName())){exempted.incrementAndGet();return;}
         if(!slots.tryAcquire()){busy.incrementAndGet();connection.disconnect(message("Verification busy","Please wait a few seconds and reconnect."));return;}
         String address=connection.getClientAddress().getAddress().getHostAddress();AtomicBoolean admitted=new AtomicBoolean();
         addresses.compute(address,(key,count)->{int n=count==null?0:count;if(n>=2)return n;admitted.set(true);return n+1;});
@@ -129,11 +137,27 @@ final class CompanionGate implements Listener,PluginMessageListener,AutoCloseabl
     @EventHandler public void disconnect(PlayerConnectionCloseEvent event){pending.forEach((c,p)->{if(!c.isConnected()){p.leave.complete(true);p.report.completeExceptionally(new IOException("Connection closed"));}});}
     boolean command(CommandSender sender,String[] args) {
         if(args.length==0||!args[0].equalsIgnoreCase("client"))return false;
-        if(!sender.hasPermission("aegisac.admin")){sender.sendMessage("AegisAC » Permission denied.");return true;}
-        if(args.length==2&&args[1].equalsIgnoreCase("reload")){try{reload();sender.sendMessage("AegisAC » Companion admission configuration reloaded; applies to new connections.");}catch(IOException e){sender.sendMessage("AegisAC » Client guard reload rejected: "+e.getMessage());}return true;}
-        sender.sendMessage("AegisAC » Companion required="+settings.enabled()+" startupError="+(startupError!=null)+" AuthMePresent="+Bukkit.getPluginManager().isPluginEnabled("AuthMe"));
-        sender.sendMessage("AegisAC » Pending="+pending.size()+" acceptedReports="+passed+" signatureBlocks="+matched+" incompleteOrMissing="+failed+" wrongNonce="+replayed+" busy="+busy);
-        sender.sendMessage("AegisAC » Checks=known loaded-code signatures; client reports can be forged. No automatic client bans. Download="+settings.download());return true;
+        if(!sender.hasPermission("aegisac.admin")){sender.sendMessage("AegisAC � Permission denied.");return true;}
+        if(args.length>=2&&args[1].equalsIgnoreCase("exempt")) {
+            if(args.length==3&&args[2].equalsIgnoreCase("list")) {
+                Set<String> names=new TreeSet<>(settings.exemptNames());
+                sender.sendMessage("AegisAC � Companion exemptions ("+names.size()+"): "+(names.isEmpty()?"none":String.join(", ",names)));return true;
+            }
+            if(args.length==4&&(args[2].equalsIgnoreCase("add")||args[2].equalsIgnoreCase("remove"))) {
+                boolean add=args[2].equalsIgnoreCase("add");
+                try {
+                    boolean changed=changeExemption(args[3],add);
+                    sender.sendMessage("AegisAC � "+args[3]+(add?(changed?" added to":" is already on"):(changed?" removed from":" is not on"))+" the companion exemption list. Applies on their next connection.");
+                    sender.sendMessage("AegisAC � AuthMe login and normal anticheat checks still apply.");
+                }catch(IOException|IllegalArgumentException error){sender.sendMessage("AegisAC � Could not update companion exemptions: "+error.getMessage());}
+                return true;
+            }
+            sender.sendMessage("AegisAC � /aegis client exempt add <username> | remove <username> | list");return true;
+        }
+        if(args.length==2&&args[1].equalsIgnoreCase("reload")){try{reload();sender.sendMessage("AegisAC � Companion admission configuration reloaded; applies to new connections.");}catch(IOException e){sender.sendMessage("AegisAC � Client guard reload rejected: "+e.getMessage());}return true;}
+        sender.sendMessage("AegisAC � Companion required="+settings.enabled()+" startupError="+(startupError!=null)+" AuthMePresent="+Bukkit.getPluginManager().isPluginEnabled("AuthMe"));
+        sender.sendMessage("AegisAC � Pending="+pending.size()+" acceptedReports="+passed+" signatureBlocks="+matched+" incompleteOrMissing="+failed+" wrongNonce="+replayed+" busy="+busy+" exemptJoins="+exempted+" exemptUsernames="+settings.exemptNames().size());
+        sender.sendMessage("AegisAC � Checks=known loaded-code signatures; client reports can be forged. No automatic client bans. Download="+settings.download());return true;
     }
     @Override public void close(){closed=true;pending.forEach((c,p)->{p.leave.complete(true);p.report.completeExceptionally(new IOException("Server stopping"));if(c.isConnected())c.disconnect(message("Server restarting","Please reconnect shortly."));});Bukkit.getMessenger().unregisterIncomingPluginChannel(plugin,AdmissionProtocol.REPORT,this);Bukkit.getMessenger().unregisterOutgoingPluginChannel(plugin,AdmissionProtocol.CHALLENGE);HandlerList.unregisterAll(this);}
 }
