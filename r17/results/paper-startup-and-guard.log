@@ -1,0 +1,12 @@
+[15:59:57] [Server thread/INFO]: [AegisAC] R17-NATIVE-GUARD1: AegisAC detection, packet prevention and remote interaction protection. Use /aegis guard status.
+[15:59:57] [Server thread/INFO]: Done (16.605s)! For help, type "help"
+[15:59:57] [Server thread/INFO]: AegisAC: R17 remote-action guard=enabled action=KICK tracked=0 blocked=0 kicks=0 pending=0 overload=0 decodeUncertainty=0
+[15:59:57] [Server thread/INFO]: AegisAC: worlds-configured-on-disk=2 changed=0 errors=0; full restart required after changes
+[16:01:27] [Server thread/INFO]: AegisAC: R17 remote-action guard=enabled action=KICK tracked=0 blocked=0 kicks=0 pending=0 overload=0 decodeUncertainty=0
+[16:01:27] [Server thread/INFO]: AegisAC » AegisLegitQA stage=0 permanent=false remaining=none
+[16:01:41] [Server thread/WARN]: [AegisAC] AegisAC blocked repeated remote interactions: AegisRemoteQA R17-MV9O2TYD: BLOCK reach=19.57 limit=5.75 confirmations=3
+[16:03:43] [Server thread/INFO]: AegisAC: R17 remote-action guard=enabled action=KICK tracked=0 blocked=3 kicks=1 pending=0 overload=0 decodeUncertainty=0
+[16:03:43] [Server thread/INFO]: AegisAC » AegisRemoteQA stage=0 permanent=false remaining=none
+[16:03:43] [Server thread/INFO]: AegisAC » 2026-10-15T15:01:41.030Z REMOTE_INTERACTION_KICK R17-MV9O2TYD: BLOCK reach=19.57 limit=5.75 confirmations=3
+[16:03:44] [Server thread/INFO]: [Not Secure] [Server] AegisAC_QA_REAL_STONE_CONFIRMED
+[16:03:44] [Server thread/INFO]: [Not Secure] [Server] AegisAC_QA_REAL_DIAMOND_CONFIRMED

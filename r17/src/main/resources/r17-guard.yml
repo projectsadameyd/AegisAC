@@ -1,0 +1,34 @@
+# Server-observable interaction protection. This is not a scan of client files or mod capabilities.
+enabled: true
+action: KICK
+# Normal reach is read from each player's live interaction attributes.
+reach-allowance: 1.25
+# A kick needs this much additional excess on every retained position, repeatedly.
+kick-excess: 2.0
+confirmations: 3
+confirmation-window-ms: 4000
+max-ping-ms: 200
+join-grace-ms: 5000
+teleport-grace-ms: 2500
+block-through-walls: true
+anti-xray:
+  auto-configure: true
+  engine-mode: 3
+  hide-cave-air: true
+  lava-obscures: true
+  # Existing terrain and seed settings are not regenerated or changed.
+messages:
+  kicked: |-
+    &6&lAegisAC
+    &8&m--------------------------------
+    &e&lRemote Interaction Blocked
+
+    &7Repeated interactions exceeded your character's
+    &7server-side reach. Remote camera interactions
+    &7are not permitted on this server.
+
+    &7Disable any freecam or remote interaction feature,
+    &7then reconnect. Contact staff if this repeats.
+
+    &8Reference: &f{reference}
+    &8&m--------------------------------

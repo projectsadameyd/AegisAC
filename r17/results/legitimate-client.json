@@ -1,0 +1,781 @@
+{
+  "mode": "legitimate",
+  "protocol": "1.21.11",
+  "started": "2026-10-15T15:00:00.621Z",
+  "steps": [
+    "spawn and eight-second stabilization",
+    "walking",
+    "sprinting",
+    "jumping and landing",
+    "sneaking and strafing",
+    "all valid hotbar slots",
+    "camera rotations",
+    "normal block break"
+  ],
+  "kicked": null,
+  "errors": [],
+  "clientWorldSamples": [
+    {
+      "x": 12,
+      "y": -58,
+      "z": 12,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 12,
+      "y": -58,
+      "z": 13,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 12,
+      "y": -58,
+      "z": 14,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 12,
+      "y": -58,
+      "z": 15,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 12,
+      "y": -58,
+      "z": 16,
+      "advertised": "diamond_ore"
+    },
+    {
+      "x": 12,
+      "y": -57,
+      "z": 12,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 12,
+      "y": -57,
+      "z": 13,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 12,
+      "y": -57,
+      "z": 14,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 12,
+      "y": -57,
+      "z": 15,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 12,
+      "y": -57,
+      "z": 16,
+      "advertised": "deepslate_redstone_ore"
+    },
+    {
+      "x": 12,
+      "y": -56,
+      "z": 12,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 12,
+      "y": -56,
+      "z": 13,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 12,
+      "y": -56,
+      "z": 14,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 12,
+      "y": -56,
+      "z": 15,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 12,
+      "y": -56,
+      "z": 16,
+      "advertised": "raw_copper_block"
+    },
+    {
+      "x": 12,
+      "y": -55,
+      "z": 12,
+      "advertised": "air"
+    },
+    {
+      "x": 12,
+      "y": -55,
+      "z": 13,
+      "advertised": "air"
+    },
+    {
+      "x": 12,
+      "y": -55,
+      "z": 14,
+      "advertised": "air"
+    },
+    {
+      "x": 12,
+      "y": -55,
+      "z": 15,
+      "advertised": "air"
+    },
+    {
+      "x": 12,
+      "y": -55,
+      "z": 16,
+      "advertised": "deepslate_gold_ore"
+    },
+    {
+      "x": 12,
+      "y": -54,
+      "z": 12,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 12,
+      "y": -54,
+      "z": 13,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 12,
+      "y": -54,
+      "z": 14,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 12,
+      "y": -54,
+      "z": 15,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 12,
+      "y": -54,
+      "z": 16,
+      "advertised": "air"
+    },
+    {
+      "x": 13,
+      "y": -58,
+      "z": 12,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 13,
+      "y": -58,
+      "z": 13,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 13,
+      "y": -58,
+      "z": 14,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 13,
+      "y": -58,
+      "z": 15,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 13,
+      "y": -58,
+      "z": 16,
+      "advertised": "diamond_ore"
+    },
+    {
+      "x": 13,
+      "y": -57,
+      "z": 12,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 13,
+      "y": -57,
+      "z": 13,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 13,
+      "y": -57,
+      "z": 14,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 13,
+      "y": -57,
+      "z": 15,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 13,
+      "y": -57,
+      "z": 16,
+      "advertised": "deepslate_redstone_ore"
+    },
+    {
+      "x": 13,
+      "y": -56,
+      "z": 12,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 13,
+      "y": -56,
+      "z": 13,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 13,
+      "y": -56,
+      "z": 14,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 13,
+      "y": -56,
+      "z": 15,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 13,
+      "y": -56,
+      "z": 16,
+      "advertised": "raw_copper_block"
+    },
+    {
+      "x": 13,
+      "y": -55,
+      "z": 12,
+      "advertised": "air"
+    },
+    {
+      "x": 13,
+      "y": -55,
+      "z": 13,
+      "advertised": "air"
+    },
+    {
+      "x": 13,
+      "y": -55,
+      "z": 14,
+      "advertised": "air"
+    },
+    {
+      "x": 13,
+      "y": -55,
+      "z": 15,
+      "advertised": "air"
+    },
+    {
+      "x": 13,
+      "y": -55,
+      "z": 16,
+      "advertised": "deepslate_gold_ore"
+    },
+    {
+      "x": 13,
+      "y": -54,
+      "z": 12,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 13,
+      "y": -54,
+      "z": 13,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 13,
+      "y": -54,
+      "z": 14,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 13,
+      "y": -54,
+      "z": 15,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 13,
+      "y": -54,
+      "z": 16,
+      "advertised": "air"
+    },
+    {
+      "x": 14,
+      "y": -58,
+      "z": 12,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 14,
+      "y": -58,
+      "z": 13,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 14,
+      "y": -58,
+      "z": 14,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 14,
+      "y": -58,
+      "z": 15,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 14,
+      "y": -58,
+      "z": 16,
+      "advertised": "diamond_ore"
+    },
+    {
+      "x": 14,
+      "y": -57,
+      "z": 12,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 14,
+      "y": -57,
+      "z": 13,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 14,
+      "y": -57,
+      "z": 14,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 14,
+      "y": -57,
+      "z": 15,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 14,
+      "y": -57,
+      "z": 16,
+      "advertised": "deepslate_redstone_ore"
+    },
+    {
+      "x": 14,
+      "y": -56,
+      "z": 12,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 14,
+      "y": -56,
+      "z": 13,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 14,
+      "y": -56,
+      "z": 14,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 14,
+      "y": -56,
+      "z": 15,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 14,
+      "y": -56,
+      "z": 16,
+      "advertised": "raw_copper_block"
+    },
+    {
+      "x": 14,
+      "y": -55,
+      "z": 12,
+      "advertised": "air"
+    },
+    {
+      "x": 14,
+      "y": -55,
+      "z": 13,
+      "advertised": "air"
+    },
+    {
+      "x": 14,
+      "y": -55,
+      "z": 14,
+      "advertised": "air"
+    },
+    {
+      "x": 14,
+      "y": -55,
+      "z": 15,
+      "advertised": "air"
+    },
+    {
+      "x": 14,
+      "y": -55,
+      "z": 16,
+      "advertised": "deepslate_gold_ore"
+    },
+    {
+      "x": 14,
+      "y": -54,
+      "z": 12,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 14,
+      "y": -54,
+      "z": 13,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 14,
+      "y": -54,
+      "z": 14,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 14,
+      "y": -54,
+      "z": 15,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 14,
+      "y": -54,
+      "z": 16,
+      "advertised": "air"
+    },
+    {
+      "x": 15,
+      "y": -58,
+      "z": 12,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 15,
+      "y": -58,
+      "z": 13,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 15,
+      "y": -58,
+      "z": 14,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 15,
+      "y": -58,
+      "z": 15,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 15,
+      "y": -58,
+      "z": 16,
+      "advertised": "diamond_ore"
+    },
+    {
+      "x": 15,
+      "y": -57,
+      "z": 12,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 15,
+      "y": -57,
+      "z": 13,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 15,
+      "y": -57,
+      "z": 14,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 15,
+      "y": -57,
+      "z": 15,
+      "advertised": "deepslate_coal_ore"
+    },
+    {
+      "x": 15,
+      "y": -57,
+      "z": 16,
+      "advertised": "deepslate_redstone_ore"
+    },
+    {
+      "x": 15,
+      "y": -56,
+      "z": 12,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 15,
+      "y": -56,
+      "z": 13,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 15,
+      "y": -56,
+      "z": 14,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 15,
+      "y": -56,
+      "z": 15,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 15,
+      "y": -56,
+      "z": 16,
+      "advertised": "raw_copper_block"
+    },
+    {
+      "x": 15,
+      "y": -55,
+      "z": 12,
+      "advertised": "air"
+    },
+    {
+      "x": 15,
+      "y": -55,
+      "z": 13,
+      "advertised": "air"
+    },
+    {
+      "x": 15,
+      "y": -55,
+      "z": 14,
+      "advertised": "air"
+    },
+    {
+      "x": 15,
+      "y": -55,
+      "z": 15,
+      "advertised": "air"
+    },
+    {
+      "x": 15,
+      "y": -55,
+      "z": 16,
+      "advertised": "deepslate_gold_ore"
+    },
+    {
+      "x": 15,
+      "y": -54,
+      "z": 12,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 15,
+      "y": -54,
+      "z": 13,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 15,
+      "y": -54,
+      "z": 14,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 15,
+      "y": -54,
+      "z": 15,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 15,
+      "y": -54,
+      "z": 16,
+      "advertised": "air"
+    },
+    {
+      "x": 16,
+      "y": -58,
+      "z": 12,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 16,
+      "y": -58,
+      "z": 13,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 16,
+      "y": -58,
+      "z": 14,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 16,
+      "y": -58,
+      "z": 15,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 16,
+      "y": -58,
+      "z": 16,
+      "advertised": "iron_ore"
+    },
+    {
+      "x": 16,
+      "y": -57,
+      "z": 12,
+      "advertised": "air"
+    },
+    {
+      "x": 16,
+      "y": -57,
+      "z": 13,
+      "advertised": "air"
+    },
+    {
+      "x": 16,
+      "y": -57,
+      "z": 14,
+      "advertised": "air"
+    },
+    {
+      "x": 16,
+      "y": -57,
+      "z": 15,
+      "advertised": "air"
+    },
+    {
+      "x": 16,
+      "y": -57,
+      "z": 16,
+      "advertised": "deepslate_gold_ore"
+    },
+    {
+      "x": 16,
+      "y": -56,
+      "z": 12,
+      "advertised": "lapis_ore"
+    },
+    {
+      "x": 16,
+      "y": -56,
+      "z": 13,
+      "advertised": "lapis_ore"
+    },
+    {
+      "x": 16,
+      "y": -56,
+      "z": 14,
+      "advertised": "lapis_ore"
+    },
+    {
+      "x": 16,
+      "y": -56,
+      "z": 15,
+      "advertised": "lapis_ore"
+    },
+    {
+      "x": 16,
+      "y": -56,
+      "z": 16,
+      "advertised": "copper_ore"
+    },
+    {
+      "x": 16,
+      "y": -55,
+      "z": 12,
+      "advertised": "coal_ore"
+    },
+    {
+      "x": 16,
+      "y": -55,
+      "z": 13,
+      "advertised": "coal_ore"
+    },
+    {
+      "x": 16,
+      "y": -55,
+      "z": 14,
+      "advertised": "coal_ore"
+    },
+    {
+      "x": 16,
+      "y": -55,
+      "z": 15,
+      "advertised": "coal_ore"
+    },
+    {
+      "x": 16,
+      "y": -55,
+      "z": 16,
+      "advertised": "gold_ore"
+    },
+    {
+      "x": 16,
+      "y": -54,
+      "z": 12,
+      "advertised": "diamond_ore"
+    },
+    {
+      "x": 16,
+      "y": -54,
+      "z": 13,
+      "advertised": "diamond_ore"
+    },
+    {
+      "x": 16,
+      "y": -54,
+      "z": 14,
+      "advertised": "diamond_ore"
+    },
+    {
+      "x": 16,
+      "y": -54,
+      "z": 15,
+      "advertised": "diamond_ore"
+    },
+    {
+      "x": 16,
+      "y": -54,
+      "z": 16,
+      "advertised": "raw_copper_block"
+    }
+  ],
+  "spawn": {
+    "x": -7.5,
+    "y": -60,
+    "z": 9.5
+  },
+  "obfuscatedInteriorSamples": 124,
+  "finalPosition": {
+    "x": -7.5,
+    "y": -60,
+    "z": 9.59830798256835
+  },
+  "finished": "2026-10-15T15:00:32.143Z"
+}

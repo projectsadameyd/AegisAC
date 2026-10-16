@@ -1,0 +1,49 @@
+{
+  "delay": 1000,
+  "flavor": "preview2",
+  "challenge": false,
+  "registered": true,
+  "spawned": false,
+  "companionRequired": true,
+  "kick": {
+    "type": "compound",
+    "value": {
+      "color": {
+        "type": "string",
+        "value": "gold"
+      },
+      "extra": {
+        "type": "list",
+        "value": {
+          "type": "compound",
+          "value": [
+            {
+              "color": {
+                "type": "string",
+                "value": "yellow"
+              },
+              "text": {
+                "type": "string",
+                "value": "Companion required\n\n"
+              }
+            },
+            {
+              "color": {
+                "type": "string",
+                "value": "gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "Install the AegisAC companion and Fabric API for Minecraft 1.21.11, then restart Minecraft and reconnect. If it is already installed, the check did not finish in time.\n\nDownload: https://github.com/projectsadameyd/AegisAC/raw/refs/heads/development/r17-native-guard/r17/downloads/AegisAC-Companion-R17-preview2-1.21.11.jar"
+              }
+            }
+          ]
+        }
+      },
+      "text": {
+        "type": "string",
+        "value": "AegisAC\n"
+      }
+    }
+  }
+}

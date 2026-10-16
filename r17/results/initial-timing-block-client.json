@@ -1,0 +1,276 @@
+{
+  "mode": "legitimate",
+  "protocol": "1.21.11",
+  "started": "2026-10-15T14:53:43.528Z",
+  "steps": [],
+  "kicked": {
+    "type": "compound",
+    "value": {
+      "extra": {
+        "type": "list",
+        "value": {
+          "type": "compound",
+          "value": [
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "underlined": {
+                "type": "byte",
+                "value": 0
+              },
+              "bold": {
+                "type": "byte",
+                "value": 1
+              },
+              "color": {
+                "type": "string",
+                "value": "gold"
+              },
+              "obfuscated": {
+                "type": "byte",
+                "value": 0
+              },
+              "strikethrough": {
+                "type": "byte",
+                "value": 0
+              },
+              "text": {
+                "type": "string",
+                "value": "AegisAC\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "bold": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "dark_gray"
+              },
+              "strikethrough": {
+                "type": "byte",
+                "value": 1
+              },
+              "text": {
+                "type": "string",
+                "value": "------------------------------\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "bold": {
+                "type": "byte",
+                "value": 1
+              },
+              "color": {
+                "type": "string",
+                "value": "yellow"
+              },
+              "strikethrough": {
+                "type": "byte",
+                "value": 0
+              },
+              "text": {
+                "type": "string",
+                "value": "Cheat Detected\n\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "bold": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "Action: "
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "white"
+              },
+              "text": {
+                "type": "string",
+                "value": "Temporary Ban "
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "(1/3)\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "Duration: "
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "white"
+              },
+              "text": {
+                "type": "string",
+                "value": "1h\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "Reason: "
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "white"
+              },
+              "text": {
+                "type": "string",
+                "value": "TickTimer\n\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "Made by: "
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "white"
+              },
+              "text": {
+                "type": "string",
+                "value": "@_adam814\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "gray"
+              },
+              "text": {
+                "type": "string",
+                "value": "Appeal: "
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "white"
+              },
+              "text": {
+                "type": "string",
+                "value": "https://discord.gg/ShtDEU2x3z\n"
+              }
+            },
+            {
+              "italic": {
+                "type": "byte",
+                "value": 0
+              },
+              "color": {
+                "type": "string",
+                "value": "dark_gray"
+              },
+              "strikethrough": {
+                "type": "byte",
+                "value": 1
+              },
+              "text": {
+                "type": "string",
+                "value": "------------------------------"
+              }
+            }
+          ]
+        }
+      },
+      "text": {
+        "type": "string",
+        "value": ""
+      }
+    }
+  },
+  "errors": [],
+  "clientWorldSamples": [],
+  "finished": "2026-10-15T14:53:50.709Z"
+}

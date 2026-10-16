@@ -1,0 +1,12 @@
+# REQUIRED companion for Fabric 1.21.11. Players without it cannot enter the world.
+# This is known-signature screening, not tamper-proof attestation or an all-cheat detector.
+enabled: true
+# These usernames skip only companion admission, including its mod requirement.
+# Case-insensitive. AuthMe and normal anticheat checks still apply.
+# On offline-mode servers this uses the name claimed before AuthMe login.
+# Manage with /aegis client exempt add|remove <username> and exempt list.
+exempt-usernames: []
+download-url: 'https://github.com/projectsadameyd/AegisAC/raw/refs/heads/development/r17-native-guard/r17/downloads/AegisAC-Companion-R17-preview2-hotfix2-1.21.11.jar'
+handshake-timeout-seconds: 12
+# The block starts immediately; this bounds how long its dialog remains connected.
+block-screen-seconds: 30

@@ -1,0 +1,134 @@
+{
+  "artifacts_sha256": {
+    "AegisAC-R17-Companion-preview2-hotfix1-1.21.11.jar": "5f5e3221f55afa7808dc7590126f315a857ee220a89eaadcf40d7e1cbb49d64a",
+    "AegisAC-Companion-R17-preview2-hotfix1-1.21.11.jar": "d21f8f8f2304c2df16a783d845ee34770d604228b3e8b08ebf16045c1b5a4862"
+  },
+  "regression": {
+    "r16_engine_classes_unchanged": 5931,
+    "java": "25.0.4.1",
+    "suites": [
+      {
+        "suite": "NativeActionRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "DispatcherHistoryRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "TimerSafetyRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "VpnSourceRecoveryRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "RemoteInteractionRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "AntiXrayRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "R17TimingSafetyRegressionTest",
+        "exit": 0
+      },
+      {
+        "suite": "CompanionAdmissionRegressionTest",
+        "exit": 0
+      }
+    ]
+  },
+  "production_codec_assertions": 8,
+  "protocol_runs": {
+    "clean": {
+      "spawned": true,
+      "challenge": true,
+      "authenticated": true,
+      "errors": [],
+      "started": "2026-10-15T20:47:26.036Z",
+      "finished": "2026-10-15T20:47:33.886Z"
+    },
+    "clean-remote": {
+      "spawned": true,
+      "challenge": true,
+      "authenticated": true,
+      "errors": [],
+      "started": "2026-10-15T20:48:22.212Z",
+      "finished": "2026-10-15T20:48:38.218Z"
+    },
+    "meteor": {
+      "spawned": false,
+      "challenge": true,
+      "authenticated": null,
+      "errors": [],
+      "started": "2026-10-15T20:47:52.269Z",
+      "finished": "2026-10-15T20:47:54.120Z"
+    },
+    "missing": {
+      "spawned": false,
+      "challenge": false,
+      "authenticated": null,
+      "errors": [],
+      "started": "2026-10-15T20:47:55.299Z",
+      "finished": "2026-10-15T20:48:01.966Z"
+    },
+    "incomplete": {
+      "spawned": false,
+      "challenge": true,
+      "authenticated": null,
+      "errors": [],
+      "started": "2026-10-15T20:48:03.201Z",
+      "finished": "2026-10-15T20:48:04.915Z"
+    },
+    "stale": {
+      "spawned": false,
+      "challenge": true,
+      "authenticated": null,
+      "errors": [],
+      "started": "2026-10-15T20:48:06.228Z",
+      "finished": "2026-10-15T20:48:12.818Z"
+    },
+    "malformed": {
+      "spawned": false,
+      "challenge": true,
+      "authenticated": null,
+      "errors": [],
+      "started": "2026-10-15T20:48:14.122Z",
+      "finished": "2026-10-15T20:48:15.767Z"
+    },
+    "old": {
+      "spawned": false,
+      "challenge": true,
+      "authenticated": null,
+      "errors": [],
+      "started": "2026-10-15T20:48:17.173Z",
+      "finished": "2026-10-15T20:48:18.919Z"
+    },
+    "exit": {
+      "spawned": false,
+      "challenge": false,
+      "authenticated": null,
+      "errors": [],
+      "started": "2026-10-15T20:48:20.178Z",
+      "finished": "2026-10-15T20:48:21.015Z"
+    },
+    "registration-delay-preview2": {
+      "delay": 1000,
+      "spawned": false,
+      "challenge": false,
+      "registered": true,
+      "reportSent": null
+    },
+    "registration-delay-preview2-hotfix1": {
+      "delay": 1000,
+      "spawned": true,
+      "challenge": true,
+      "registered": true,
+      "reportSent": true
+    }
+  },
+  "scope": "Loopback Paper 1.21.11 build 132 + AuthMe 6.0.1; real scanner and production codecs; no human Fabric/BlueClient rendering test."
+}
